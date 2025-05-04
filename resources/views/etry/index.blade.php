@@ -113,12 +113,18 @@
                     @if($outOfStock)
                         <span class="bg-red-500 text-white w-full py-2 rounded-lg mt-auto text-sm md:text-base text-center block">Out of Stock</span>
                     @else
-                        <a href="{{ route('products.show', $product->id) }}" class="bg-blue-500 text-white w-full py-2 rounded-lg hover:bg-blue-600 mt-auto text-sm md:text-base text-center block">Buy Now</a>
+                        <a href="{{ route('products.show', $product->id) }}" class="bg-white text-black border-2 w-full py-2 rounded-lg hover:bg-[#FAC000] mt-auto text-sm md:text-base text-center block duration-100">Buy Now</a>
                     @endif
                 </div>
             @endforeach
-
         </div>
+
+        <!-- No Products Found Message -->
+        @if($products->isEmpty())
+            <div class="col-span-4 text-center mt-4">
+                <p class="text-gray-500">No products found.</p>
+            </div>
+        @endif
 
         <!-- Pagination Links -->
         <div class="mt-6">

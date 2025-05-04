@@ -17,11 +17,16 @@ class ProductController extends Controller
         return view('etry.addProduct');
     }
 
-    public function index(Request $request){
+    public function index(Request $request)
+    {
         $sortOption = $request->get('sort', 'desc');
         $genderFilter = $request->get('gender', ''); // Get gender filter from request
-    
-        $products = Product::when($sortOption === 'price_asc', function ($query) {
+        $searchTerm = $request->get('search', ''); // Get search query from request
+
+        $products = Product::when($searchTerm, function ($query, $searchTerm) {
+                return $query->where('name', 'like', '%' . $searchTerm . '%');
+            })
+            ->when($sortOption === 'price_asc', function ($query) {
                 return $query->orderBy('price', 'asc');
             })
             ->when($sortOption === 'price_desc', function ($query) {
@@ -34,13 +39,13 @@ class ProductController extends Controller
                 return $query->where('gender', $genderFilter);
             })
             ->paginate(12);
-    
+
         $user = Auth::user();
         $cartItemIds = $user 
             ? Cart::where('user_id', $user->id)->pluck('product_id')->toArray() 
             : [];
-    
-        return view('etry.index', compact('products', 'sortOption', 'cartItemIds', 'genderFilter'));
+
+        return view('etry.index', compact('products', 'sortOption', 'cartItemIds', 'genderFilter', 'searchTerm'));
     }
 
     public function update(Request $request, $productId)

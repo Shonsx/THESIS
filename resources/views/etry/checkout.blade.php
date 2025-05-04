@@ -70,11 +70,11 @@
             @endif
 
              {{-- Address Section --}}
-            <div class="bg-white rounded-lg shadow-lg p-4 mb-4">
+            <div class="container w-1/2 bg-white rounded-lg shadow-lg p-4 mb-4">
                 <h2 class="text-lg font-bold mb-2">Shipping Address</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-1 gap-4">
                     <div>
-                        <label for="address" class="font-semibold block">Address:</label>
+                        <label for="address" class="font-semibold block">Street:</label>
                         <input type="text" name="address" id="address" value="{{ old('address', auth()->user()->address->address ?? '') }}" required class="border px-2 py-1 rounded w-full">
                     </div>
                     <div>

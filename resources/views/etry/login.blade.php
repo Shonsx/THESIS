@@ -72,9 +72,9 @@
 
     <div class=" h-screen overflow-hidden flex flex-col">
         <div class="flex-1 flex items-center justify-center bg-cover bg-center" style="background-image: url({{asset('images/BG.png')}})">
-            <div class="container max-w-lg h-1/2  bg-[#8B0000] rounded-3xl flex flex-col">
+            <div class="container max-w-lg h-1/2 bg-[#8c8c8c]/20 backdrop-blur-md border-1 rounded-3xl flex flex-col">
                 <div class="container w-full h-20 flex justify-center items-center text-center mt-5">
-                    <h2 class="text-5xl text-white font-bold" style="font-family: 'Poppins'">Login</h2>
+                    <h2 class="text-5xl text-black font-bold" style="font-family: 'Poppins'">Login</h2>
                 </div>
                 <div class="container w-full h-64 border-b-2 ">
                     <form action="{{ route('login') }}" method="POST" class="flex flex-col items-center text-center">
@@ -98,7 +98,7 @@
                             <label><input type="checkbox">Remember me</label>
                             <a href="">Forgot Password?</a>
                         </div>
-                        <button type="submit" class="w-80 h-12 bg-white hover:bg-red-600 hover:text-white transition-colors duration-300 text-black text-xl rounded-full my-4" style="font-family: 'Poppins'">Login</button>
+                        <button type="submit" class="w-80 h-12 bg-white hover:bg-[#FAC000] hover:text-black transition-colors duration-300 text-black text-xl rounded-full my-4" style="font-family: 'Poppins'">Login</button>
                         <a href="/signup" class="text-white hover:text-red-500 mt-5" style="font-family: 'Poppins'">Don't have an account? Sign Up</a>
                     </form>
                 </div>

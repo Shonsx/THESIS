@@ -8,7 +8,7 @@
                     <a href="" class="w-55 h-12 flex items-center justify-center font-semibold border border-black rounded-lg px-6 transition duration-300 bg-white text-black hover:bg-black hover:text-white">
                         Learn More
                     </a>
-                    <a href="" class="w-55 h-12 flex items-center justify-center font-semibold bg-[#7C0000] text-white rounded-lg px-6 transition duration-300 hover:bg-[#22B2B2] hover:text-black">
+                    <a href="" class="w-55 h-12 flex items-center justify-center font-semibold bg-[#FAC000] text-black rounded-lg px-6 transition duration-300 hover:bg-black hover:text-white">
                         Explore
                     </a>
                 </div>
@@ -17,7 +17,7 @@
             </div>            
         </div>
         <div class="w-1/2 h-full flex justify-center items-center">
-            <img src="{{ asset('images/MODEL.png') }}" class="max-w-[90%] max-h-[90%] object-contain">
+            <img src="{{ asset('images/backgroundLogo.jpg') }}" class="max-w-[90%] max-h-[90%] object-contain">
         </div>
     </div>
 
@@ -26,13 +26,13 @@
             <div class="w-full md:w-1/2 h-full flex flex-col justify-center text-center md:text-left">
                 <h1 class="text-lg md:text-4xl pb-3 md:pb-5 font-bold" style="font-family: 'Poppins'">Featured Products</h1>
                 <p class="text-sm md:text-lg pb-3 md:pb-5 font-bold" style="font-family: 'Poppins'">Browse our latest collection</p>
-                <a href="" class="!w-[250px] md:w-[200px] h-10 md:h-12 flex items-center justify-center font-semibold bg-[#7C0000] text-white rounded-lg px-4 md:px-6 transition duration-300 hover:bg-[#22B2B2] hover:text-black mx-auto md:mx-0">
+                <a href="" class="!w-[250px] md:w-[200px] h-10 md:h-12 flex items-center justify-center font-semibold bg-[#FAC000] text-white rounded-lg px-4 md:px-6 transition duration-300 hover:bg-black hover:text-white mx-auto md:mx-0">
                     Shop Now
                 </a>
                 
             </div>
             <div class="w-full md:w-1/2 h-auto flex justify-center md:justify-end">
-                <img src="{{ asset('images/featuredProducts.png') }}" class="w-full md:w-auto h-[150px] md:h-full object-contain">
+                <img src="{{ asset('images/featuredProducts.jpg') }}" class="w-full md:w-auto md:h-[250px] object-contain">
             </div>
         </div>
     
@@ -43,7 +43,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                     <!-- Product Card 1 -->
                     <div class="border rounded-lg overflow-hidden relative bg-white transition-transform duration-300 hover:shadow-xl hover:-translate-y-2">
-                        <img src="{{ asset('images/product/TEST.jpg') }}" alt="Black Jacket" class="w-full h-64 object-contain">
+                        <img src="" alt="Black Jacket" class="w-full h-64 object-contain">
                         <div class="p-4 flex justify-between items-center">
                             <div>
                                 <h2 class="text-lg font-semibold">Black Jacket</h2>

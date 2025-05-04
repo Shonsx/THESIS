@@ -11,11 +11,11 @@
 </head>
 <body>
     <header>
-        <nav class="bg-[#8B0000] py-2 px-4">
+        <nav class="bg-[#000000] py-2 px-4">
             <div class="flex justify-between items-center">
                 <div class="flex items-center space-x-2 cursor-pointer" onclick="window.location.href='/'">
                     <img src="{{asset('icons/Shopping-bag.svg')}}" class="w-8 h-8">
-                    <img src="{{asset('images/E-Try_Logo.png')}}" alt="E-Try" class="w-auto h-13">
+                    <img src="{{asset('images/E-Try_Logo(1).png')}}" alt="E-Try" class="w-auto h-13">
                 </div>
         
                 <!-- Menu Items -->
@@ -23,21 +23,28 @@
                     @if(auth()->check())
                         @if(auth()->user()->role == 'admin')
                             <li>
-                                <a href="{{ route('addProduct') }}" class="w-30 px-4 py-2 border bg-[#B22222] text-center text-white rounded-xl transition duration-500 hover:bg-[#00c7c7] hover:text-black">Add Product</a>
+                                <a href="{{ route('addProduct') }}" class="w-30 px-4 py-2 border bg-[#8c8c8c] text-center text-black rounded-xl transition duration-500 hover:bg-[#00c7c7] hover:text-white">Add Product</a>
                             </li>
                         @elseif(auth()->user()->role == 'cashier')
                             <li>
-                                <a href="{{ route('cashier.main') }}" class="w-30 px-4 py-2 border bg-[#B22222] text-center text-white rounded-xl transition duration-500 hover:bg-[#00c7c7] hover:text-black">Sell List</a>
+                                <a href="{{ route('cashier.main') }}" class="w-30 px-4 py-2 border bg-[#8c8c8c] text-center text-white rounded-xl transition duration-500 hover:bg-[#00c7c7] hover:text-white">Sell List</a>
                             </li>
                         @endif
                     @endif
                     <li><a href="/product" class="text-white text-lg" style="font-family:'Poppins'">Products</a></li>
-                    <form action="" method="GET" class="relative">
-                        <input type="text" name="query" placeholder="Search" class="w-60 min-w-min px-4 py-2 pr-10 pl-3 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+                    {{-- Search Bar --}}
+                    <form action="{{ route('products.index') }}" method="GET" class="relative">
+                        <input 
+                            type="text" 
+                            name="search"  
+                            value="{{ request('search') }}" 
+                            placeholder="Search" 
+                            class="w-60 min-w-min px-4 py-2 pr-10 pl-3 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                            onkeydown="if(event.key === 'Enter') { this.form.submit(); }" /> <!-- Submit form on Enter -->
                         <div class="absolute inset-y-0 right-2 flex items-center">
-                            <img src="{{asset('icons/icons8-search.svg')}}" class="w-5 h-5">
+                            <img src="{{ asset('icons/icons8-search.svg') }}" class="w-5 h-5">
                         </div>
-                    </form>
+                    </form>                    
                     @auth
                         <div class="relative">
                             <button class="focus:outline-none" onclick="toggleNotifications()" aria-expanded="false">
@@ -61,15 +68,21 @@
                                         @endif
                                     </div>
                                     <ul class="max-h-60 overflow-y-auto">
-                                        @forelse(auth()->user()->unreadNotifications as $notification)
+                                        @php
+                                            $notifications = auth()->user()->unreadNotifications->filter(function ($notification) {
+                                                return !empty($notification->data['message']);
+                                            });
+                                        @endphp
+                                    
+                                        @forelse($notifications as $notification)
                                             <li class="px-4 py-2 border-b">
-                                                <p class="text-sm">{{ $notification->data['message'] ?? 'No message available' }}</p>
+                                                <p class="text-sm">{{ $notification->data['message'] }}</p>
                                                 <a href="{{ route('notifications.read', $notification->id) }}" class="text-xs text-blue-600 notification-link">Mark as read</a>
                                             </li>
                                         @empty
                                             <li class="px-4 py-2 text-sm text-gray-500">No new notifications</li>
                                         @endforelse
-                                    </ul>
+                                    </ul>                                    
                                 @else
                                     <p class="px-4 py-2 text-sm text-gray-500">You need to be logged in to see notifications.</p>
                                 @endif
@@ -78,7 +91,7 @@
                         <h2 class="text-white">{{Auth::user()->name}}</h2>
                         <div class="relative">
                             <button id="dropdownBtn" class="focus:outline-none">
-                                <img src="{{ asset('icons/arrow-drop-down-svgrepo-com.svg') }}" alt="Dropdown" class="w-10 h-10 cursor-pointer hover:bg-[#00c7c7] rounded-full" />
+                                <img src="{{ asset('icons/arrow-drop-down-svgrepo-com(w).svg') }}" alt="Dropdown" class="w-10 h-10 cursor-pointer transition duration-500 hover:bg-[#00c7c7] rounded-full" />
                             </button>
                             <div id="dropdownMenu" class="absolute right-0 mt-2 w-40 bg-white border border-gray-300 rounded-lg shadow-lg hidden">
                                 <a href="{{ route('account') }}" class="block px-4 py-2 hover:bg-gray-100">Account</a>
@@ -91,8 +104,8 @@
                             </div>
                         </div>
                     @else
-                        <a href="/login" class="w-30 px-4 py-2 border bg-[#B22222] text-center text-white rounded-xl transition duration-500 hover:bg-[#00c7c7] hover:text-black">Login</a>
-                        <a href="/signup" class="w-30 px-4 py-2 border bg-[#B22222] text-center text-white rounded-xl transition duration-500 hover:bg-[#00c7c7] hover:text-black">Register</a>
+                        <a href="/login" class="w-30 px-4 py-2 border bg-[#8c8c8c] text-center text-black rounded-xl transition duration-500 hover:bg-[#00c7c7] hover:text-white">Login</a>
+                        <a href="/signup" class="w-30 px-4 py-2 border bg-[#8c8c8c] text-center text-black rounded-xl transition duration-500 hover:bg-[#00c7c7] hover:text-white">Register</a>
                     @endauth
                 </ul>
             </div>
@@ -103,10 +116,10 @@
             </button>
         
             <!-- Mobile Menu -->
-        <ul id="mobile-menu" class="hidden flex-col items-center space-y-4 mt-4 bg-[#8B0000] p-4 rounded-lg w-full">
+        <ul id="mobile-menu" class="hidden flex-col items-center space-y-4 mt-4 bg-[#000000] p-4 rounded-lg w-full">
             @if(auth()->check() && auth()->user()->id == 1)
                 <li>
-                    <a href="{{ route('addProduct') }}" class="w-30 px-4 py-2 border bg-[#B22222] text-center text-white rounded-xl transition duration-500 hover:bg-[#00c7c7] hover:text-black">
+                    <a href="{{ route('addProduct') }}" class="w-30 px-4 py-2 border bg-[#8c8c8c] text-center text-white rounded-xl transition duration-500 hover:bg-[#00c7c7] hover:text-black">
                         Add Product
                     </a>
                 </li>
@@ -126,7 +139,7 @@
                 <h2 class="text-white">{{ Auth::user()->name }}</h2>
                 <div class="relative w-full">
                     <button id="dropdownBtn" class="focus:outline-none w-full text-left">
-                        <img src="{{ asset('icons/arrow-drop-down-svgrepo-com.svg') }}" 
+                        <img src="{{ asset('icons/arrow-drop-down-svgrepo-com(w).svg') }}" 
                             alt="Dropdown" 
                             class="w-10 h-10 cursor-pointer hover:bg-[#00c7c7] rounded-full"/>
                     </button>

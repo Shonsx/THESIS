@@ -79,9 +79,9 @@
 
     <div class=" h-screen overflow-hidden flex flex-col">
         <div class="flex-1 flex items-center justify-center bg-cover bg-center" style="background-image: url({{asset('images/BG.png')}})">
-            <div class="container max-w-lg h-1/2  bg-[#8B0000] rounded-3xl flex flex-col">
+            <div class="container max-w-lg h-1/2 bg-[#8c8c8c]/20 backdrop-blur-md border-1 rounded-3xl flex flex-col">
                 <div class="container w-full h-20 flex justify-center items-center text-center mt-5">
-                    <h2 class="text-5xl text-white font-bold" style="font-family: 'Poppins'">Register</h2>
+                    <h2 class="text-5xl text-black font-bold" style="font-family: 'Poppins'">Register</h2>
                 </div>
                 <div class="container w-full h-72 border-b-2 ">
                     <form action="{{ route('register') }}" method="POST" class="flex flex-col items-center text-center">
