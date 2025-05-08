@@ -81,8 +81,24 @@ class ProductController extends Controller
                     }
                 }
             }
-            $product->sizes = json_encode(array_unique($request->sizes));
+            // Define the desired order of sizes
+            $sizeOrder = ['', 'S', 'M', 'L', 'XL'];
+
+            // Decode existing sizes
+            $existingSizes = $product->sizes ? json_decode($product->sizes, true) : [];
+
+            // Merge and get unique list
+            $updatedSizes = array_unique(array_merge($existingSizes, $request->sizes));
+
+            // Sort sizes according to defined order
+            usort($updatedSizes, function ($a, $b) use ($sizeOrder) {
+                return array_search($a, $sizeOrder) <=> array_search($b, $sizeOrder);
+            });
+
+            // Save updated, sorted sizes
+            $product->sizes = json_encode($updatedSizes);
             $product->save();
+
         }
 
         // Handle the image update

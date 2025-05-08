@@ -50,9 +50,19 @@
                         <button onclick="showDeleteModal({{ $product->id }})" class="absolute top-2 right-2 bg-white rounded-full p-1 shadow-md hidden group-hover:inline-block z-10 transition cursor-pointer">
                             <img src="{{ asset('icons/delete-1-svgrepo-com.svg') }}" class="w-5 h-5" alt="Delete">
                         </button>
-                        <button onclick="openEditModal({{ $product->id }})" class="absolute top-2 right-14 bg-white rounded-full p-1 shadow-md hidden group-hover:inline-block z-10 transition cursor-pointer">
+                        <button
+                            onclick="openEditModal(this)"
+                            class="absolute top-2 right-14 bg-white rounded-full p-1 shadow-md hidden group-hover:inline-block z-10 transition cursor-pointer"
+                            data-id="{{ $product->id }}"
+                            data-name="{{ $product->name }}"
+                            data-description="{{ $product->description }}"
+                            data-price="{{ $product->price }}"
+                            data-sizes='@json($product->sizes)'
+                            data-image="{{ $product->image }}"
+                        >
                             <img src="{{ asset('icons/editbutton.svg') }}" class="w-5 h-5" alt="Edit">
                         </button>
+
                     @endif
 
                     <!-- Image -->
@@ -62,7 +72,10 @@
                     <div class="p-4 flex-grow flex justify-between items-start">
                         <div class="w-3/4">
                             <h2 class="text-lg md:text-xl font-bold">{{ $product->name }}</h2>
-                            <p class="text-gray-600 text-sm md:text-base">{{ $product->description }}</p>
+                            <p class="text-gray-600 text-sm md:text-base">
+                                {{ \Illuminate\Support\Str::words($product->description, 4, '...') }}
+                            </p>
+                            
 
                             @php
                                 $sizes = json_decode($product->sizes, true);
@@ -144,76 +157,69 @@
     </div>
 
     <!-- Edit Product Modal -->
-    <div id="edit-product-modal" class="fixed inset-0 bg-opacity-50 justify-center items-center z-50 hidden">
-        <div class="rounded-lg bg-gray-800 text-white shadow-lg p-6 text-center max-w-sm w-full">
+    <div id="edit-product-modal" class="fixed inset-0  bg-opacity-50 hidden justify-center items-center z-50">
+        <div class="rounded-lg bg-gray-800 text-white shadow-lg p-6 text-center max-w-sm w-full relative">
             <h2 class="text-xl font-semibold mb-4">Edit Product</h2>
-            @if(isset($product))
-            <form id="edit-product-form" action="{{ route('products.update', $product->id) }}" method="POST" enctype="multipart/form-data">
+
+            <form id="edit-product-form" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
 
-                <!-- Hidden input for product-id -->
-                <input type="hidden" id="product-id" name="product_id" value="{{ old('product_id', $product->id) }}">
+                <!-- Hidden input for product ID -->
+                <input type="hidden" id="product-id" name="product_id">
 
                 <!-- Product Name -->
                 <div class="mb-4">
                     <label for="product-name" class="block text-sm">Name</label>
-                    <input type="text" id="product-name" name="name" class="w-full p-2 rounded border" value="{{ old('name', $product->name) }}" required>
+                    <input type="text" id="product-name" name="name" class="w-full p-2 rounded border" required>
                 </div>
 
-                <!-- Product Description -->
+                <!-- Description -->
                 <div class="mb-4">
                     <label for="product-description" class="block text-sm">Description</label>
-                    <textarea id="product-description" name="description" class="w-full p-2 rounded border" required>{{ old('description', $product->description) }}</textarea>
+                    <textarea id="product-description" name="description" class="w-full p-2 rounded border" required></textarea>
                 </div>
 
-                <!-- Product Price -->
+                <!-- Price -->
                 <div class="mb-4">
                     <label for="product-price" class="block text-sm">Price</label>
-                    <input type="number" id="product-price" name="price" class="w-full p-2 rounded border" value="{{ old('price', $product->price) }}" step="0.01" required>
+                    <input type="number" id="product-price" name="price" class="w-full p-2 rounded border" step="0.01" required>
                 </div>
 
-                <!-- Product Sizes & Stock -->
+                <!-- Sizes & Stock -->
                 <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700">Sizes & Stock</label>
+                    <label class="block text-sm mb-2">Sizes & Stock</label>
                     <div id="sizes-wrapper" class="space-y-2">
                         @foreach(['S', 'M', 'L', 'XL'] as $size)
                             <div class="flex items-center space-x-2">
-                                <input type="checkbox" id="size_{{ $size }}" name="sizes[]" value="{{ $size }}" 
-                                    onclick="toggleStockInput('{{ $size }}')" 
-                                    {{ in_array($size, old('sizes', json_decode($product->sizes, true))) ? 'checked' : '' }}>
+                                <input type="checkbox" id="size_{{ $size }}" name="sizes[]" value="{{ $size }}" onclick="toggleStockInput('{{ $size }}')" 
+                                    @if(in_array($size, $availableSizes)) checked @endif>
                                 <label for="size_{{ $size }}" class="flex-grow">{{ $size }}</label>
                                 <input type="number" name="stock[{{ $size }}]" id="stock_{{ $size }}" placeholder="Stock for {{ $size }}"
-                                    class="ml-4 px-2 py-1 border rounded w-32 {{ in_array($size, old('sizes', json_decode($product->sizes, true))) ? '' : 'hidden' }}"
-                                    value="{{ old('stock.' . $size, isset($product->sizes[$size]) ? $product->sizes[$size] : '') }}" min="0">
+                                    class="ml-4 px-2 py-1 border rounded w-32 hidden" min="0" 
+                                    @if(in_array($size, $availableSizes)) value="{{ $sizes[$size] ?? 0 }}" @endif>
                             </div>
-                        @endforeach                    
+                        @endforeach
                     </div>
                 </div>
 
-                <!-- Product Image -->
+
+                <!-- Image Preview -->
                 <div class="mb-4">
-                    <label for="image" class="block text-sm font-medium text-gray-700">Image</label>
-                    <!-- Display current image if available -->
-                    @if($product->image)
-                        <div class="mb-2">
-                            <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="w-full h-40 sm:h-56 object-contain rounded-t-lg">
-                        </div>
-                    @endif
-                    <input type="file" name="image" id="image" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 cursor-pointer hover:border-blue-500">
+                    <label for="image" class="block text-sm">Image</label>
+                    <img id="product-image-preview" class="mb-2 w-full h-40 object-contain rounded" src="" alt="Product Image">
+                    <input type="file" name="image" id="image" class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-1 cursor-pointer hover:border-blue-500">
                 </div>
 
-                <!-- Submit Button -->
+                <!-- Buttons -->
                 <div class="flex justify-center space-x-4">
-                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Save Changes</button>
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Save</button>
                     <button type="button" onclick="closeEditModal()" class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400">Cancel</button>
                 </div>
             </form>
-            @else
-                <p>Product not found.</p>
-            @endif
         </div>
     </div>
+
 
 
 
@@ -288,22 +294,61 @@
 
         // Open the Edit Product Modal and fetch product data
         function toggleStockInput(size) {
-            const stockInput = document.getElementById('stock_' + size);
             const checkbox = document.getElementById('size_' + size);
-            if (checkbox.checked) {
-                stockInput.classList.remove('hidden');
+            const input = document.getElementById('stock_' + size);
+            input.classList.toggle('hidden', !checkbox.checked);
+        }
+
+
+        function openEditModal(button) {
+            const id = button.getAttribute('data-id');
+            const name = button.getAttribute('data-name');
+            const description = button.getAttribute('data-description');
+            const price = button.getAttribute('data-price');
+            const image = button.getAttribute('data-image');
+            const sizes = JSON.parse(button.getAttribute('data-sizes') || '{}');
+
+            // Set form action dynamically
+            const form = document.getElementById('edit-product-form');
+            form.action = `/products/${id}`;
+
+            // Fill form fields
+            document.getElementById('product-id').value = id;
+            document.getElementById('product-name').value = name;
+            document.getElementById('product-description').value = description;
+            document.getElementById('product-price').value = price;
+
+            // Handle sizes
+            ['S', 'M', 'L', 'XL'].forEach(size => {
+                const checkbox = document.getElementById('size_' + size);
+                const input = document.getElementById('stock_' + size);
+
+                if (sizes.hasOwnProperty(size)) {
+                    checkbox.checked = true;
+                    input.classList.remove('hidden');
+                    input.value = sizes[size];
+                } else {
+                    checkbox.checked = false;
+                    input.classList.add('hidden');
+                    input.value = '';
+                }
+            });
+
+            // Image
+            const imagePreview = document.getElementById('product-image-preview');
+            if (image) {
+                imagePreview.src = `/storage/${image}`;
+                imagePreview.classList.remove('hidden');
             } else {
-                stockInput.classList.add('hidden');
+                imagePreview.classList.add('hidden');
             }
+
+            // Show modal
+            const modal = document.getElementById('edit-product-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
         }
 
-        // Function to open the modal
-        function openEditModal() {
-            document.getElementById('edit-product-modal').classList.remove('hidden');
-            document.getElementById('edit-product-modal').classList.add('flex');
-        }
-
-        // Function to close the modal
         function closeEditModal() {
             document.getElementById('edit-product-modal').classList.add('hidden');
         }
