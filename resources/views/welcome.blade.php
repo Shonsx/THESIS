@@ -1,3 +1,26 @@
+<style>
+@keyframes scroll-horizontal {
+    0% {
+        transform: translateX(0%);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+.animate-scroll-carousel {
+    animation: scroll-horizontal 10s linear infinite;
+    display: flex;
+    white-space: nowrap;
+}
+
+.group-hover\:paused:hover {
+    animation-play-state: paused;
+}
+</style>
+
+
+
 <x-layout title="Home">
     <div class="w-full h-130 mt-10 border-b border-gray-400 flex justify-between items-center">
         <div class="w-1/2 h-full flex justify-center items-center">
@@ -36,60 +59,36 @@
             </div>
         </div>
     
-        <!-- Empty Container for Cards BELOW the "Featured Products" -->
-        <div class="max-w-[1200px] w-full h-auto mt-5 p-5 flex flex-wrap justify-center">
-            <!-- Cards will go here -->
-            <div class="container mx-auto">
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                    <!-- Product Card 1 -->
-                    <div class="border rounded-lg overflow-hidden relative bg-white transition-transform duration-300 hover:shadow-xl hover:-translate-y-2">
-                        <img src="" alt="Black Jacket" class="w-full h-64 object-contain">
-                        <div class="p-4 flex justify-between items-center">
-                            <div>
-                                <h2 class="text-lg font-semibold">Black Jacket</h2>
-                                <p class="text-xl font-bold text-black">₱154.99</p>
+        <!-- BELOW the "Featured Products" -->
+        <div class="w-full bg-white py-12 flex justify-center">
+            <div class="relative w-full max-w-[1200px] overflow-hidden group">
+                <div class="flex gap-6 animate-scroll-carousel group-hover:paused">
+                    @foreach($products as $product)
+                        <div class="min-w-[250px] max-w-[250px] h-[250px] bg-white border rounded-lg shadow-lg overflow-hidden relative group/item hover:scale-105 transition-transform duration-300">
+                            <!-- Product Image -->
+                            <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="w-full h-48 object-contain">
+
+                            <!-- Blur Overlay on Hover -->
+                            <div class="absolute inset-0 backdrop-blur-sm bg-white/30 opacity-0 group-hover/item:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                                <h3 class="text-black text-lg font-extrabold text-center px-2">{{ $product->name }}</h3>
                             </div>
-                            <a href="{{ url('/virtual-tryon') }}">
-                                <img src="{{ asset('icons/camera-svgrepo-com.svg') }}" alt="Camera Icon" class="w-8 h-8">
-                            </a>
                         </div>
-                    </div>
-        
-                    <!-- Product Card 2 -->
-                    <div class="border rounded-lg overflow-hidden relative bg-white transition-transform duration-300 hover:shadow-xl hover:-translate-y-2">
-                        <img src="" alt="Mom Jeans" class="w-full h-64 object-cover">
-                        <div class="p-4 flex justify-between items-center">
-                            <div>
-                                <h2 class="text-lg font-semibold">Mom Jeans</h2>
-                                <p class="text-xl font-bold text-black">₱154.99</p>
+                    @endforeach
+
+                    <!-- Duplicate for seamless looping -->
+                    @foreach($products as $product)
+                        <div class="min-w-[250px] max-w-[250px] h-[250px] bg-white border rounded-lg shadow-lg overflow-hidden relative group/item hover:scale-105 transition-transform duration-300">
+                            <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="w-full h-48 object-contain">
+
+                            <div class="absolute inset-0 backdrop-blur-sm bg-white/30 opacity-0 group-hover/item:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                                <h3 class="text-black text-lg font-extrabold text-center px-2">{{ $product->name }}</h3>
                             </div>
-                            <a href="{{ url('/virtual-tryon') }}">
-                                <img src="{{ asset('icons/camera-svgrepo-com.svg') }}" alt="Camera Icon" class="w-8 h-8">
-                            </a>
                         </div>
-                    </div>
-        
-                    <!-- Product Card 3 -->
-                    <div class="border rounded-lg overflow-hidden relative bg-white transition-transform duration-300 hover:shadow-xl hover:-translate-y-2">
-                        <img src="" alt="Blank Olive T-shirt" class="w-full h-64 object-cover">
-                        <div class="p-4 flex justify-between items-center">
-                            <div>
-                                <h2 class="text-lg font-semibold">Blank Olive T-shirt</h2>
-                                <p class="text-xl font-bold text-black">₱119.99</p>
-                            </div>
-                            <a href="{{ url('/virtual-tryon') }}">
-                                <img src="{{ asset('icons/camera-svgrepo-com.svg') }}" alt="Camera Icon" class="w-8 h-8">
-                            </a>
-                        </div>
-                    </div>
+                    @endforeach
                 </div>
             </div>
-            
         </div>
-    </div>
-    
-    
-    
-    
+
+
 
 </x-layout>

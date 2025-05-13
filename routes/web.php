@@ -11,10 +11,10 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CashierController;
 use App\Http\Controllers\NotificationController;
 use App\Models\Order;
+use App\Http\Controllers\HomeController;
 
-Route::get('/', function () {
-    return view('welcome');
-})->name('welcome');
+Route::get('/', [HomeController::class, 'index'])->name('welcome');
+
 
 Route::get('/product', [ProductController::class, 'index'])->name('products.index');
 

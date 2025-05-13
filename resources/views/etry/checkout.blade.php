@@ -22,7 +22,7 @@
                             <label class="font-semibold">Select Size:</label><br>
                             @foreach ($product->stocks->where('stock', '>', 0) as $stock)
                                 <label class="inline-flex items-center mr-4 mt-1">
-                                    <input type="radio" name="size" value="{{ $stock->size }}" required class="mr-1">
+                                    <input type="radio" name="size" value="{{ $stock->size }}" data-price="{{ $product->price }}" data-stock="{{ $stock->stock }}" required class="mr-1 size-radio">
                                     {{ strtoupper($stock->size) }} ({{ $stock->stock }} available)
                                 </label>
                             @endforeach
@@ -30,7 +30,7 @@
 
                         <div class="mt-2">
                             <label for="quantity" class="font-semibold">Quantity:</label>
-                            <input type="number" name="quantity" id="quantity" value="1" min="1" class="border px-2 py-1 rounded w-20 ml-2">
+                            <input type="number" name="quantity" id="quantity" value="1" min="1" class="border px-2 py-1 rounded w-20 ml-2" max="1">
                         </div>
                     </div>
                 </div>
@@ -55,13 +55,13 @@
                             <label class="block mt-2 font-semibold">Select Size:</label>
                             @foreach ($item->product->stocks->where('stock', '>', 0) as $stock)
                                 <label class="inline-flex items-center mr-4 mt-1">
-                                    <input type="radio" name="items[{{ $item->id }}][size]" value="{{ $stock->size }}" required class="mr-1">
+                                    <input type="radio" name="items[{{ $item->id }}][size]" value="{{ $stock->size }}" data-price="{{ $item->product->price }}" data-stock="{{ $stock->stock }}" required class="mr-1 size-radio-{{ $item->id }}">
                                     {{ strtoupper($stock->size) }} ({{ $stock->stock }} left)
                                 </label>
                             @endforeach
 
                             <label class="block mt-2 font-semibold">Quantity:</label>
-                            <input type="number" name="items[{{ $item->id }}][quantity]" id="quantity_{{ $item->id }}" value="1" min="1" class="border rounded px-2 py-1 w-20">
+                            <input type="number" name="items[{{ $item->id }}][quantity]" id="quantity_{{ $item->id }}" value="1" min="1" class="border rounded px-2 py-1 w-20" max="1">
                         </div>
                     </div>
                 @endforeach
@@ -103,29 +103,37 @@
         </form>
     </div>
 
-    {{-- JavaScript for Dynamic Total --}}
+    {{-- JavaScript for Dynamic Total and Stock Limit --}}
     <script>
-        function calculateTotal() {
-            let total = 0;
+        // Function to update total price when quantity or size changes
+        function updatePrice() {
+            let selectedSize = document.querySelector('input[name="size"]:checked');
+            if (selectedSize) {
+                const price = parseFloat(selectedSize.getAttribute('data-price'));
+                const stock = parseInt(selectedSize.getAttribute('data-stock'));
+                const quantityInput = document.getElementById('quantity');
+                quantityInput.setAttribute('max', stock);
 
-            @if(isset($product))
-                const price = {{ $product->price }};
-                const qty = parseInt(document.getElementById('quantity').value || 0);
-                total = price * qty;
-            @elseif(isset($cartItems))
-                document.querySelectorAll('[id^="quantity_"]').forEach(input => {
-                    let price = parseFloat(input.closest('.flex-grow').querySelector('.text-lg.font-semibold').innerText.replace('₱', ''));
-                    total += price * parseInt(input.value || 0);
-                });
-            @endif
+                const quantity = parseInt(quantityInput.value);
+                const totalPrice = price * quantity;
 
-            document.getElementById('total-price').innerText = total.toFixed(2);
+                document.getElementById('total-price').innerText = totalPrice.toFixed(2);
+            }
         }
 
-        document.querySelectorAll('input[type="number"]').forEach(input => {
-            input.addEventListener('input', calculateTotal);
+        // Event listeners for size and quantity changes
+        document.querySelectorAll('input[name="size"]').forEach(input => {
+            input.addEventListener('change', function() {
+                updatePrice(); // Update price when size changes
+            });
         });
 
-        calculateTotal();
+        // Event listener for quantity changes
+        document.getElementById('quantity').addEventListener('input', function() {
+            updatePrice(); // Update price when quantity changes
+        });
+
+        
+        updatePrice();
     </script>
 </x-layout>
