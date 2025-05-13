@@ -19,6 +19,7 @@ return new class extends Migration
             $table->text('description');
             $table->string('image');
             $table->json('sizes')->nullable();
+            $table->string('measurement_image')->nullable();
             $table->timestamps();
         });
     }

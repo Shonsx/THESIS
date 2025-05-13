@@ -24,6 +24,13 @@
                     </label>
                 </div>
             </div>            
+
+            <div class="mb-4">
+                <label for="measurement_image" class="block text-sm font-medium text-gray-700">Measurement Image</label>
+                <input type="file" name="measurement_image" id="measurement_image" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 cursor-pointer hover:border-blue-500" accept="image/*">
+            </div>
+
+
             <div class="mb-4">
                 <label class="block text-sm font-medium text-gray-700">Sizes & Stock</label>
                 <div id="sizes-wrapper" class="space-y-2">
@@ -59,5 +66,19 @@
         const stockInput = document.getElementById(`stock_${size}`);
         stockInput.classList.toggle('hidden', !checkbox.checked);
     }
+    function toggleCustomUpload(show) {
+        const input = document.getElementById('customMeasurementInput');
+        input.classList.toggle('hidden', !show);
+    }
+
+    // Also hide input if other radio is selected
+    document.querySelectorAll('input[name="measurement_type"]').forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            if (e.target.value !== 'custom') {
+                toggleCustomUpload(false);
+            }
+        });
+    });
+
 </script>
 </x-layout>

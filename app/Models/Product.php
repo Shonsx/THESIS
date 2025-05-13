@@ -17,6 +17,7 @@ class Product extends Model
         'description',
         'image',
         'sizes',
+        'measurement_image',
     ];
 
     protected $casts = [

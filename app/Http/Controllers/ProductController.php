@@ -125,12 +125,29 @@ class ProductController extends Controller
             'price' => 'required|numeric',
             'description' => 'nullable|string',
             'image' => 'image|nullable',
+            'measurement_image' => 'image|nullable',
             'sizes' => 'array',
             'gender' => 'required|in:Men,Women',
         ]);
 
-        // Handle image
+        // Handle product image
         $imagePath = $request->file('image')?->store('products', 'public');
+
+        $measurementImagePath = null;
+        if ($request->hasFile('measurement_image')) {
+            $file = $request->file('measurement_image');
+            $filename = $file->getClientOriginalName(); // keep original name
+            $storagePath = 'measurements/' . $filename;
+
+            // Check if the file already exists
+            if (!Storage::disk('public')->exists($storagePath)) {
+                // If not exists, store it
+                $file->storeAs('measurements', $filename, 'public');
+            }
+
+            // Either way, set the path
+            $measurementImagePath = $storagePath;
+        }
 
         // Save product
         $product = Product::create([
@@ -138,6 +155,7 @@ class ProductController extends Controller
             'price' => $request->price,
             'description' => $request->description,
             'image' => $imagePath,
+            'measurement_image' => $measurementImagePath, // ← Save measurement image
             'sizes' => json_encode($request->sizes),
             'gender' => $request->gender,
         ]);
@@ -155,6 +173,7 @@ class ProductController extends Controller
 
         return redirect()->route('products.index')->with('success', 'Product added!');
     }
+
 
 
 

@@ -93,7 +93,7 @@
                             <button id="dropdownBtn" class="focus:outline-none">
                                 <img src="{{ asset('icons/arrow-drop-down-svgrepo-com(w).svg') }}" alt="Dropdown" class="w-10 h-10 cursor-pointer transition duration-500 hover:bg-[#00c7c7] rounded-full" />
                             </button>
-                            <div id="dropdownMenu" class="absolute right-0 mt-2 w-40 bg-white border border-gray-300 rounded-lg shadow-lg hidden">
+                            <div id="dropdownMenu" class="absolute right-0 mt-2 w-40 bg-white border border-gray-300 rounded-lg shadow-lg hidden z-50">
                                 <a href="{{ route('account') }}" class="block px-4 py-2 hover:bg-gray-100">Account</a>
                                 <a href="{{ auth()->user()->role == 'admin' ? route('settings.admin') : route('settings.account') }}" class="block px-4 py-2 hover:bg-gray-100">Settings</a>
                                 <a href="{{ route('cart.show') }}" class="block px-4 py-2 hover:bg-gray-100">Cart</a>

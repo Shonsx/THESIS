@@ -190,14 +190,12 @@
                 <div class="mb-4">
                     <label class="block text-sm mb-2">Sizes & Stock</label>
                     <div id="sizes-wrapper" class="space-y-2">
-                        @foreach(['S', 'M', 'L', 'XL'] as $size)
+                       @foreach(['S', 'M', 'L', 'XL'] as $size)
                             <div class="flex items-center space-x-2">
-                                <input type="checkbox" id="size_{{ $size }}" name="sizes[]" value="{{ $size }}" onclick="toggleStockInput('{{ $size }}')" 
-                                    @if(in_array($size, $availableSizes)) checked @endif>
+                                <input type="checkbox" id="size_{{ $size }}" name="sizes[]" value="{{ $size }}" onclick="toggleStockInput('{{ $size }}')">
                                 <label for="size_{{ $size }}" class="flex-grow">{{ $size }}</label>
                                 <input type="number" name="stock[{{ $size }}]" id="stock_{{ $size }}" placeholder="Stock for {{ $size }}"
-                                    class="ml-4 px-2 py-1 border rounded w-32 hidden" min="0" 
-                                    @if(in_array($size, $availableSizes)) value="{{ $sizes[$size] ?? 0 }}" @endif>
+                                    class="ml-4 px-2 py-1 border rounded w-32 hidden" min="0">
                             </div>
                         @endforeach
                     </div>
