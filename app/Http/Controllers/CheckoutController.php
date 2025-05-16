@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\ProductStock;
@@ -26,6 +25,7 @@ class CheckoutController extends Controller
             'city' => 'required|string|max:100',
             'state' => 'required|string|max:100',
             'zip' => 'required|string|max:20',
+            'payment_proof' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
         ]);
 
         Address::updateOrCreate(
@@ -37,6 +37,12 @@ class CheckoutController extends Controller
                 'zip' => $validated['zip'],
             ]
         );
+
+        // 📸 Handle payment proof upload
+        $paymentProofPath = null;
+        if ($request->hasFile('payment_proof')) {
+            $paymentProofPath = $request->file('payment_proof')->store('payment_proofs', 'public');
+        }
 
         // 🛍️ Process single item checkout
         if ($request->type === 'single') {
@@ -54,6 +60,7 @@ class CheckoutController extends Controller
                     'size' => $request->size,
                     'quantity' => $request->quantity,
                     'total_price' => $product->price * $request->quantity,
+                    'payment_proof_path' => $paymentProofPath,
                 ]);
 
                 $orders[] = $order;
@@ -80,6 +87,7 @@ class CheckoutController extends Controller
                         'size' => $size,
                         'quantity' => $quantity,
                         'total_price' => $item->product->price * $quantity,
+                        'payment_proof_path' => $paymentProofPath,
                     ]);
 
                     $orders[] = $order;

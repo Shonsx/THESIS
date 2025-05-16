@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('size');
             $table->integer('quantity');
             $table->decimal('total_price', 10, 2);
+            $table->string('payment_proof_path')->nullable();
             $table->boolean('processed')->default(false);
             $table->timestamps();
         });

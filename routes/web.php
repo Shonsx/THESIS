@@ -12,6 +12,7 @@ use App\Http\Controllers\CashierController;
 use App\Http\Controllers\NotificationController;
 use App\Models\Order;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\GCashController;
 
 Route::get('/', [HomeController::class, 'index'])->name('welcome');
 
@@ -36,6 +37,14 @@ Route::post('/addProduct', [ProductController::class, 'store'])->name('addProduc
 Route::get('/products/{id}', [ProductController::class, 'show'])->name('products.show');
 Route::delete('/products/delete/{id}', [ProductController::class, 'destroy'])->middleware('auth');
 Route::put('/products/{id}', [ProductController::class, 'update'])->name('products.update');
+Route::get('/etry/gcash', function () {
+    return view('etry.gcash');
+})->name('gcash.page');
+Route::get('/gcash', [GCashController::class, 'index'])->name('gcash.index');
+Route::post('/gcash', [GCashController::class, 'store'])->name('gcash.store');
+
+
+
 
 // ACCOUNT EDIT
 Route::middleware('auth')->group(function () {
@@ -55,8 +64,6 @@ Route::middleware(['auth'])->group(function () {
 
 
 
-
-
 // SETTINGS FOR ADMIN
 Route::get('/settings/admin', function () {
     return view('etry.settingsAdmin');
@@ -70,6 +77,9 @@ Route::get('/settings/account', function () {
 Route::get('/cashier', function() {
     return view('cashier.main');
 })->middleware('auth')->name('cashier.main');
+Route::get('/cashier/order/{id}', [CashierController::class, 'orderDetails'])->name('cashier.orderDetails');
+
+
 // ADMIN CONTROLLER
 Route::middleware(['auth'])->group(function () {
     Route::get('/settings/admin', [AdminController::class, 'settings'])->name('settings.admin');
@@ -82,6 +92,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/cart/bulk-action', [CartController::class, 'bulkAction'])->name('cart.bulkAction');
     Route::get('/checkout', [CartController::class, 'checkout'])->name('checkout.index');
 });
+
 //CASHIER CONTROL
 Route::get('/cashier', function () {
     if (Auth::user()->role !== 'cashier') {
@@ -102,6 +113,7 @@ Route::patch('/cashier/order/{order}', [CashierController::class, 'updateStatus'
 Route::get('/cashier/history', [CashierController::class, 'history'])->name('cashier.history');
 Route::patch('/cashier/update-status/{order}', [CashierController::class, 'updateStatus'])->name('cashier.updateStatus');
 Route::get('/cashier/order/{orderId}', [CashierController::class, 'orderDetails'])->name('cashier.orderDetails');
+
 
 
 // NOTIFICATION ROUTES

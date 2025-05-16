@@ -2,16 +2,16 @@
     <div class="container mx-auto p-4">
         <h1 class="text-2xl font-bold mb-4">🛒 Checkout</h1>
 
-        <form action="{{ route('checkout.process') }}" method="POST">
+        <form action="{{ route('checkout.process') }}" method="POST" enctype="multipart/form-data">
             @csrf
 
             @if(isset($product))
-                {{-- Hidden flag for single item checkout --}}
+                {{-- Single item checkout --}}
                 <input type="hidden" name="type" value="single">
                 <input type="hidden" name="product_id" value="{{ $product->id }}">
 
                 <div class="bg-white rounded-lg shadow-lg p-4 flex items-center mb-4">
-                    <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="w-24 h-24 object-cover rounded">
+                    <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="w-[300px] h-[300px] object-cover rounded">
                     <div class="ml-4 flex-grow">
                         <h2 class="text-lg font-bold">{{ $product->name }}</h2>
                         <p class="text-gray-600">{{ $product->description }}</p>
@@ -36,7 +36,7 @@
                 </div>
 
             @elseif(isset($cartItems) && count($cartItems) > 0)
-                {{-- Hidden flag for cart checkout --}}
+                {{-- Cart checkout --}}
                 <input type="hidden" name="type" value="cart">
 
                 @foreach($cartItems as $item)
@@ -69,26 +69,43 @@
                 <p class="text-gray-500">No items selected for checkout.</p>
             @endif
 
-             {{-- Address Section --}}
-            <div class="container w-1/2 bg-white rounded-lg shadow-lg p-4 mb-4">
-                <h2 class="text-lg font-bold mb-2">Shipping Address</h2>
-                <div class="grid grid-cols-1 md:grid-cols-1 gap-4">
-                    <div>
-                        <label for="address" class="font-semibold block">Street:</label>
-                        <input type="text" name="address" id="address" value="{{ old('address', auth()->user()->address->address ?? '') }}" required class="border px-2 py-1 rounded w-full">
+            <div class="container flex">
+                {{-- Address Section --}}
+                <div class="container w-1/2 bg-white rounded-lg shadow-lg p-4 mr-5 mb-4">
+                    <h2 class="text-lg font-bold mb-2">Shipping Address</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-1 gap-4">
+                        <div>
+                            <label for="address" class="font-semibold block">Street:</label>
+                            <input type="text" name="address" id="address" value="{{ old('address', auth()->user()->address->address ?? '') }}" required class="border px-2 py-1 rounded w-full">
+                        </div>
+                        <div>
+                            <label for="city" class="font-semibold block">City:</label>
+                            <input type="text" name="city" id="city" value="{{ old('city', auth()->user()->address->city ?? '') }}" required class="border px-2 py-1 rounded w-full">
+                        </div>
+                        <div>
+                            <label for="state" class="font-semibold block">State/Province:</label>
+                            <input type="text" name="state" id="state" value="{{ old('state', auth()->user()->address->state ?? '') }}" required class="border px-2 py-1 rounded w-full">
+                        </div>
+                        <div>
+                            <label for="zip" class="font-semibold block">Zip/Postal Code:</label>
+                            <input type="text" name="zip" id="zip" value="{{ old('zip', auth()->user()->address->zip ?? '') }}" required class="border px-2 py-1 rounded w-full">
+                        </div>
                     </div>
-                    <div>
-                        <label for="city" class="font-semibold block">City:</label>
-                        <input type="text" name="city" id="city" value="{{ old('city', auth()->user()->address->city ?? '') }}" required class="border px-2 py-1 rounded w-full">
-                    </div>
-                    <div>
-                        <label for="state" class="font-semibold block">State/Province:</label>
-                        <input type="text" name="state" id="state" value="{{ old('state', auth()->user()->address->state ?? '') }}" required class="border px-2 py-1 rounded w-full">
-                    </div>
-                    <div>
-                        <label for="zip" class="font-semibold block">Zip/Postal Code:</label>
-                        <input type="text" name="zip" id="zip" value="{{ old('zip', auth()->user()->address->zip ?? '') }}" required class="border px-2 py-1 rounded w-full">
-                    </div>
+                </div>
+
+                {{-- GCash and Proof of Payment --}}
+                <div class="w-1/2 bg-white rounded-lg shadow-lg p-4 flex flex-col items-center">
+                    <h2 class="text-lg font-bold mb-2">Pay with GCash</h2>
+
+                    @if(isset($gcash) && $gcash->image_path && file_exists(storage_path('app/public/' . $gcash->image_path)))
+                        <img src="{{ asset('storage/' . $gcash->image_path) }}" alt="GCash QR" />
+                    @else
+                        <p>GCash image not available</p>
+                    @endif
+
+
+                    <label for="payment_proof" class="font-semibold block w-full text-center">Upload Proof of Payment (pay exactly):</label>
+                    <input type="file" name="payment_proof" id="payment_proof" accept="image/*" required class="mt-2 border px-2 py-1 rounded w-full">
                 </div>
             </div>
 
@@ -105,7 +122,6 @@
 
     {{-- JavaScript for Dynamic Total and Stock Limit --}}
     <script>
-        // Function to update total price when quantity or size changes
         function updatePrice() {
             let selectedSize = document.querySelector('input[name="size"]:checked');
             if (selectedSize) {
@@ -121,19 +137,12 @@
             }
         }
 
-        // Event listeners for size and quantity changes
         document.querySelectorAll('input[name="size"]').forEach(input => {
-            input.addEventListener('change', function() {
-                updatePrice(); // Update price when size changes
-            });
+            input.addEventListener('change', updatePrice);
         });
 
-        // Event listener for quantity changes
-        document.getElementById('quantity').addEventListener('input', function() {
-            updatePrice(); // Update price when quantity changes
-        });
+        document.getElementById('quantity').addEventListener('input', updatePrice);
 
-        
         updatePrice();
     </script>
 </x-layout>

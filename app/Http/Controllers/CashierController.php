@@ -61,14 +61,16 @@ class CashierController extends Controller
         
         
 
-        return redirect()->route('cashier.history')->with('success', 'Order completed!');
+        return redirect()->route('cashier.main')->with('success', 'Order completed!');
     }
 
-    public function orderDetails($orderId)
+    public function orderDetails($id)
     {
-        $order = Order::findOrFail($orderId);
+        $order = Order::with(['user', 'product'])->findOrFail($id);
         return view('cashier.buyerDetails', compact('order'));
     }
+
+
 
 
     public function history()

@@ -13,6 +13,7 @@ class Order extends Model
         'quantity',
         'total_price',
         'processed',
+        'payment_proof_path',
     ];
 
     public function user()
