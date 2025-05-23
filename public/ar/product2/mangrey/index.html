@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>%UNITY_WEB_NAME%</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        background: transparent;
+        overflow: hidden;
+        height: 100%;
+        width: 100%;
+      }
+      canvas {
+        background: transparent !important;
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="unity-canvas"></canvas>
+    <script>
+      var buildUrl = "%UNITY_WEBGL_BUILD_URL%";
+      var config = {
+        dataUrl: buildUrl + "%UNITY_DATA_URL%",
+        frameworkUrl: buildUrl + "%UNITY_FRAMEWORK_URL%",
+        codeUrl: buildUrl + "%UNITY_CODE_URL%",
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: "%UNITY_COMPANY_NAME%",
+        productName: "%UNITY_PRODUCT_NAME%",
+        productVersion: "%UNITY_PRODUCT_VERSION%",
+        webglContextAttributes: { alpha: true } // 🔥 This is the key!
+      };
+
+      createUnityInstance(document.querySelector("#unity-canvas"), config).then((unityInstance) => {
+        window.unityInstance = unityInstance;
+      }).catch((message) => {
+        alert(message);
+      });
+    </script>
+  </body>
+</html>

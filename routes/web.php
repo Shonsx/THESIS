@@ -13,6 +13,8 @@ use App\Http\Controllers\NotificationController;
 use App\Models\Order;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\GCashController;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Response;
 
 Route::get('/', [HomeController::class, 'index'])->name('welcome');
 
@@ -26,6 +28,38 @@ Route::get('/login', function () {
 Route::get('/signup', function () {
     return view('etry.signup');
 });
+
+Route::get('/try-on/{id}/test', function ($id) {
+    $productFolderPath = public_path("ar/product{$id}");
+
+    if (!is_dir($productFolderPath)) {
+        abort(404, 'Product folder not found.');
+    }
+
+    // Find subfolders inside the product folder
+    $subfolders = array_filter(glob($productFolderPath . '/*'), 'is_dir');
+
+    $testFilePath = null;
+
+    foreach ($subfolders as $subfolder) {
+        $possibleTestFile = $subfolder . '/test.html'; // Directly inside subfolder, NOT in build/
+        if (file_exists($possibleTestFile)) {
+            $testFilePath = $possibleTestFile;
+            break;
+        }
+    }
+
+    if (!$testFilePath) {
+        abort(404, 'Try-on file not found.');
+    }
+
+    // Return the file so the browser loads the test.html directly
+    return response()->file($testFilePath);
+})->name('tryon.test');
+
+
+
+
 
 
 Route::post('/register', [AuthController::class,'register'])->name('register');
