@@ -1,4 +1,26 @@
 <x-layout title="Order History">
+    <style>
+        body {
+            position: relative;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('{{ asset('images/BG-2.jpg') }}');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.3; 
+            z-index: -1;
+        }
+    </style>
     <div class="container mx-auto px-4 py-6">
         <h2 class="text-xl font-bold mb-4">Order History</h2>
 

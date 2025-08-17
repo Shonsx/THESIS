@@ -1,7 +1,7 @@
 <x-layout title="Cashier Panel">
     <div class="container mx-auto px-4 py-6">
         <div class="flex justify-between items-center mb-6">
-            <h2 class="text-xl font-bold">Sell List</h2>
+            <h2 class="text-xl font-bold">Orders List</h2>
             <a href="{{ route('cashier.history') }}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
                 History
             </a>

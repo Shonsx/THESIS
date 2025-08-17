@@ -15,7 +15,7 @@
             <div class="flex justify-between items-center">
                 <div class="flex items-center space-x-2 cursor-pointer" onclick="window.location.href='/'">
                     <img src="{{asset('icons/Shopping-bag.svg')}}" class="w-8 h-8">
-                    <img src="{{asset('images/E-Try_Logo(1).png')}}" alt="E-Try" class="w-auto h-13">
+                    <img src="{{asset('images/E-LOGO-removebg-preview.png')}}" alt="E-Try" class="w-auto h-15 scale-125">
                 </div>
         
                 <!-- Menu Items -->
@@ -28,9 +28,9 @@
                             <li>
                                 <a href="{{ route('gcash.index') }}" class="w-30 px-4 py-2 border bg-[#00c7c7] text-center text-white rounded-xl transition duration-500 hover:bg-[#FFD700] hover:text-black">GCASH</a>
                             </li>
-                        @elseif(auth()->user()->role == 'cashier')
+                        @elseif(auth()->user()->role == 'manager/stuff')
                             <li>
-                                <a href="{{ route('cashier.main') }}" class="w-30 px-4 py-2 border bg-[#8c8c8c] text-center text-white rounded-xl transition duration-500 hover:bg-[#00c7c7] hover:text-white">Sell List</a>
+                                <a href="{{ route('cashier.main') }}" class="w-30 px-4 py-2 border bg-[#8c8c8c] text-center text-white rounded-xl transition duration-500 hover:bg-[#00c7c7] hover:text-white">Orders</a>
                             </li>
                         @endif
                     @endif

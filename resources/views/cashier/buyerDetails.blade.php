@@ -1,8 +1,30 @@
 <x-layout title="Buyer Details">
+    <style>
+        body {
+            position: relative;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('{{ asset('images/BG-1.jpg') }}');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.3; 
+            z-index: -1;
+        }
+    </style>
     <div class="container mx-auto px-4 py-6">
-        <h2 class="text-xl font-bold mb-4">Order Details</h2>
 
         <div class="bg-white p-6 rounded-lg shadow-md max-w-2xl mx-auto">
+            <h2 class="text-2xl font-bold mb-4 text-center">Order Details</h2>
             <p><strong>Buyer Name:</strong> {{ $order->user ? $order->user->name : 'N/A' }}</p>
             <p><strong>Product:</strong> {{ $order->product ? $order->product->name : 'N/A' }}</p>
             <p><strong>Size:</strong> {{ strtoupper($order->size) }}</p>

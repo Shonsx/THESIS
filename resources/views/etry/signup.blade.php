@@ -77,53 +77,87 @@
         }
     </style>
 
-    <div class=" h-screen overflow-hidden flex flex-col">
-        <div class="flex-1 flex items-center justify-center bg-cover bg-center" style="background-image: url({{asset('images/BG.png')}})">
-            <div class="container max-w-lg h-1/2 bg-[#8c8c8c]/20 backdrop-blur-md border-1 rounded-3xl flex flex-col">
-                <div class="container w-full h-20 flex justify-center items-center text-center mt-5">
+    <div class="h-screen overflow-auto flex flex-col">
+        <div class="flex-1 flex items-center justify-center bg-cover bg-center" style="background-image: url({{ asset('images/BG.png') }})">
+            <div class="container max-w-lg w-full bg-[#8c8c8c]/20 backdrop-blur-md border-1 rounded-3xl flex flex-col h-auto py-6 px-4">
+                
+                <div class="w-full flex justify-center text-center mb-6">
                     <h2 class="text-5xl text-black font-bold" style="font-family: 'Poppins'">Register</h2>
                 </div>
-                <div class="container w-full h-72 border-b-2 ">
-                    <form action="{{ route('register') }}" method="POST" class="flex flex-col items-center text-center">
-                        @csrf
-                        <div class="relative my-2 w-80 input-box">
-                            <span class="icon"><ion-icon name="mail"></ion-icon></span>
-                            <input type="email" name="email" id="email" placeholder=" " style="font-family: 'Poppins'">
-                            <label for="email">Email</label>
-                            @error('email')
-                                <p class="absolute text-xs text-white -bottom-5 left-2">{{ $message }}</p>
-                            @enderror
-                        </div>
-                        <div class="relative my-2 w-80 input-box">
-                            <span class="icon"><ion-icon name="lock-closed"></ion-icon></span>
-                            <input type="password" name="password" id="password" placeholder=" " style="font-family: 'Poppins'">
-                            <label for="password">Password</label>
-                            @error('password')
-                                <p class="absolute text-xs text-white -bottom-5 left-2">{{ $message }}</p>
-                            @enderror
-                        </div>
-                        <div class="relative my-2 w-80 input-box">
-                            <span class="icon"><ion-icon name="person"></ion-icon></span>
-                            <input type="text" name="name" id="name" placeholder=" " style="font-family: 'Poppins'">
-                            <label for="name">Full Name</label>
-                            @error('name')
-                                <p class="absolute text-xs text-white -bottom-5 left-2">{{ $message }}</p>
-                            @enderror
-                        </div>
-                        <div class="relative my-2 w-80 input-box">
-                            <span class="icon"><ion-icon name="call"></ion-icon></span>
-                            <input type="tel" pattern="[0-9]*" inputmode="numeric" name="tel" id="tel" placeholder=" " style="font-family: 'Poppins'">
-                            <label for="number">Phone/Tel Number</label>
-                        </div>
-                        <button type="submit" class="w-80 h-12 mt-3 bg-white hover:bg-red-600 hover:text-white transition-colors duration-300 text-black text-xl rounded-full my-4" style="font-family: 'Poppins'">Register</button>
-                    </form>
-                </div>
-                
+
+                <form action="{{ route('register') }}" method="POST" class="flex flex-col items-center text-center gap-4">
+                    @csrf
+
+                    <div class="relative w-80 input-box">
+                        <span class="icon"><ion-icon name="mail"></ion-icon></span>
+                        <input type="email" name="email" id="email" placeholder=" " style="font-family: 'Poppins'">
+                        <label for="email">Email</label>
+                        @error('email')
+                            <p class="absolute text-xs text-white -bottom-5 left-2">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="relative w-80 input-box">
+                        <span class="icon"><ion-icon name="lock-closed"></ion-icon></span>
+                        <input type="password" name="password" id="password" placeholder=" " style="font-family: 'Poppins'">
+                        <label for="password">Password</label>
+                        @error('password')
+                            <p class="absolute text-xs text-white -bottom-5 left-2">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="relative w-80 input-box">
+                        <span class="icon"><ion-icon name="lock-closed-outline"></ion-icon></span>
+                        <input type="password" name="password_confirmation" id="password_confirmation" placeholder=" " style="font-family: 'Poppins'">
+                        <label for="password_confirmation">Re-enter Password</label>
+                    </div>
+                    <p id="password-match-msg" class="text-md text-white"></p>
+
+                    <div class="relative w-80 input-box">
+                        <span class="icon"><ion-icon name="person"></ion-icon></span>
+                        <input type="text" name="name" id="name" placeholder=" " style="font-family: 'Poppins'">
+                        <label for="name">Full Name</label>
+                        @error('name')
+                            <p class="absolute text-xs text-white -bottom-5 left-2">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="relative w-80 input-box">
+                        <span class="icon"><ion-icon name="call"></ion-icon></span>
+                        <input type="tel" pattern="[0-9]*" inputmode="numeric" name="tel" id="tel" placeholder=" " style="font-family: 'Poppins'">
+                        <label for="tel">Phone/Tel Number</label>
+                    </div>
+
+                    <button type="submit" class="w-80 h-12 bg-white hover:bg-red-600 hover:text-white transition-colors duration-300 text-black text-xl rounded-full" style="font-family: 'Poppins'">
+                        Register
+                    </button>
+                </form>
             </div>
         </div>
     </div>
 
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script>
+        const password = document.getElementById('password');
+        const confirmPassword = document.getElementById('password_confirmation');
+        const matchMsg = document.getElementById('password-match-msg');
 
+        function validatePasswords() {
+            if (password.value && confirmPassword.value) {
+                if (password.value === confirmPassword.value) {
+                    matchMsg.textContent = "Passwords match!";
+                    matchMsg.style.color = "lightgreen";
+                } else {
+                    matchMsg.textContent = "Passwords do not match.";
+                    matchMsg.style.color = "red";
+                }
+            } else {
+                matchMsg.textContent = "";
+            }
+        }
+
+        password.addEventListener('input', validatePasswords);
+        confirmPassword.addEventListener('input', validatePasswords);
+    </script>
 </x-layout>

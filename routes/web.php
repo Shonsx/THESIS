@@ -129,7 +129,7 @@ Route::middleware(['auth'])->group(function () {
 
 //CASHIER CONTROL
 Route::get('/cashier', function () {
-    if (Auth::user()->role !== 'cashier') {
+    if (Auth::user()->role !== 'manager/stuff') {
         return redirect()->route('welcome')->with('error', 'Unauthorized');
     }
 
