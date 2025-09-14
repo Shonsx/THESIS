@@ -28,13 +28,24 @@
                             <li>
                                 <a href="{{ route('gcash.index') }}" class="w-30 px-4 py-2 border bg-[#00c7c7] text-center text-white rounded-xl transition duration-500 hover:bg-[#FFD700] hover:text-black">GCASH</a>
                             </li>
-                        @elseif(auth()->user()->role == 'manager/stuff')
+                        @elseif(auth()->user()->role == 'manager/staff')
                             <li>
                                 <a href="{{ route('cashier.main') }}" class="w-30 px-4 py-2 border bg-[#8c8c8c] text-center text-white rounded-xl transition duration-500 hover:bg-[#00c7c7] hover:text-white">Orders</a>
                             </li>
                         @endif
                     @endif
-                    <li><a href="/product" class="text-white text-lg" style="font-family:'Poppins'">Products</a></li>
+                    <li>
+                        @if(auth()->check() && auth()->user()->role == 'admin')
+                            <a href="{{ route('admin.index') }}" 
+                            class="text-white text-lg" 
+                            style="font-family:'Poppins'">Products</a>
+                        @else
+                            <a href="/product" 
+                            class="text-white text-lg" 
+                            style="font-family:'Poppins'">Products</a>
+                        @endif
+                    </li>
+
                     {{-- Search Bar --}}
                     <form action="{{ route('products.index') }}" method="GET" class="relative">
                         <input 

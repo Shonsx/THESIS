@@ -79,7 +79,7 @@
                                 @csrf
                                 <select name="role" class="border rounded p-1">
                                     <option value="admin" {{ $user->role == 'admin' ? 'selected' : '' }}>Admin</option>
-                                    <option value="manager/stuff" {{ $user->role == 'manager/stuff' ? 'selected' : '' }}>Manager/Stuff</option>
+                                    <option value="manager/staff" {{ $user->role == 'manager/staff' ? 'selected' : '' }}>Manager/Staff</option>
                                     <option value="customer" {{ $user->role == 'customer' ? 'selected' : '' }}>Customer</option>
                                 </select>
                                 <button type="submit" class="ml-2 bg-blue-500 text-white px-2 py-1 rounded">Update</button>

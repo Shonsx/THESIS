@@ -17,6 +17,10 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Response;
 
 Route::get('/', [HomeController::class, 'index'])->name('welcome');
+Route::get('/admin', [ProductController::class, 'indexAdmin'])
+    ->name('admin.index')
+    ->middleware('auth');
+
 
 
 Route::get('/product', [ProductController::class, 'index'])->name('products.index');
@@ -56,6 +60,11 @@ Route::get('/try-on/{id}/test', function ($id) {
     // Return the file so the browser loads the test.html directly
     return response()->file($testFilePath);
 })->name('tryon.test');
+
+
+
+
+
 
 
 
@@ -129,7 +138,7 @@ Route::middleware(['auth'])->group(function () {
 
 //CASHIER CONTROL
 Route::get('/cashier', function () {
-    if (Auth::user()->role !== 'manager/stuff') {
+    if (Auth::user()->role !== 'manager/staff') {
         return redirect()->route('welcome')->with('error', 'Unauthorized');
     }
 

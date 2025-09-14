@@ -48,11 +48,19 @@ class AuthController extends Controller
         }
 
         if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
-            return redirect('/product');
+            $request->session()->regenerate();
+
+            // ✅ Check role after login
+            if (Auth::user()->role === 'admin') {
+                return redirect()->route('admin.index'); // send to admin dashboard
+            }
+
+            return redirect()->route('products.index'); // normal users
         }
 
         return back()->with('error','Invalid email or password ⚠️');
     }
+
 
     public function isAdmin() {
         return Auth::check() && Auth::user()->id == 1;

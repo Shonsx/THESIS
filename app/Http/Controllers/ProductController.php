@@ -48,6 +48,42 @@ class ProductController extends Controller
         return view('etry.index', compact('products', 'sortOption', 'cartItemIds', 'genderFilter', 'searchTerm'));
     }
 
+    public function indexAdmin(Request $request)
+    {
+        // Ensure only admin can access
+        if (!Auth::check() || Auth::user()->role !== 'admin') {
+            abort(403, 'Unauthorized');
+        }
+
+        $sortOption = $request->get('sort', 'desc'); // default sort
+        $genderFilter = $request->get('gender', '');
+
+        // Fetch all products with sorting and filtering
+        $products = Product::when($genderFilter, function($query, $genderFilter) {
+                return $query->where('gender', $genderFilter);
+            })
+            ->when($sortOption === 'price_asc', function ($query) {
+                return $query->orderBy('price', 'asc');
+            })
+            ->when($sortOption === 'price_desc', function ($query) {
+                return $query->orderBy('price', 'desc');
+            })
+            ->when($sortOption === 'asc' || $sortOption === 'desc', function ($query) use ($sortOption) {
+                return $query->orderBy('created_at', $sortOption);
+            })
+            ->paginate(12);
+
+        $user = Auth::user();
+        $cartItemIds = $user 
+            ? Cart::where('user_id', $user->id)->pluck('product_id')->toArray() 
+            : [];
+
+        return view('etry.indexAdmin', compact('products', 'sortOption', 'genderFilter', 'cartItemIds'));
+    }
+
+
+
+
     public function update(Request $request, $productId)
     {
         $product = Product::findOrFail($productId);
@@ -202,8 +238,9 @@ class ProductController extends Controller
         }
 
         $product->delete();
-
-        return response()->json(['success' => true]);
+        
+        return redirect()->route('products.indexAdmin')
+                     ->with('success', 'Product deleted successfully.');
     }
 
 }
