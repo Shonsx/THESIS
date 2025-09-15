@@ -68,7 +68,7 @@
                     <th class="border border-gray-300 px-4 py-2">Name</th>
                     <th class="border border-gray-300 px-4 py-2">Description</th>
                     <th class="border border-gray-300 px-4 py-2">Price</th>
-                    <th class="border border-gray-300 px-4 py-2">Sizes</th>
+                    <th class="border border-gray-300 px-4 py-2">Sizes & Stocks</th>
                     @if(auth()->check() && auth()->user()->id == 1)
                         <th class="border border-gray-300 px-4 py-2">Actions</th>
                     @endif
@@ -115,12 +115,22 @@
                         </td>
                         @if(auth()->check() && auth()->user()->id == 1)
                             <td class="border border-gray-300 px-4 py-2 text-center space-x-2">
+                                <!-- Edit Button -->
                                 <button class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-                                        onclick="openEditModal('{{ $product->id }}','{{ $product->name }}','{{ $product->description }}','{{ $product->price }}','{{ $product->image }}',@json($sizeStocks))">
+                                    data-id="{{ $product->id }}"
+                                    data-name="{{ $product->name }}"
+                                    data-desc="{{ $product->description }}"
+                                    data-price="{{ $product->price }}"
+                                    data-image="{{ $product->image }}"
+                                    data-sizes='@json($sizeStocks)'
+                                    onclick="openEditModal(this)">
                                     Edit
                                 </button>
+
+                                <!-- Delete Button -->
                                 <button class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                                        onclick="openDeleteModal({{ $product->id }})">
+                                    data-id="{{ $product->id }}"
+                                    onclick="openDeleteModal(this)">
                                     Delete
                                 </button>
                             </td>
@@ -141,7 +151,7 @@
 
     <!-- Edit Modal -->
     <div id="edit-modal" class="modal">
-        <div class="bg-white rounded-lg p-6 w-full max-w-md relative">
+        <div class="bg-white rounded-lg p-6 w-full max-w-md relative max-h-[90vh] overflow-y-auto">
             <h2 class="text-xl font-bold mb-4">Edit Product</h2>
             <form id="edit-product-form" method="POST" enctype="multipart/form-data">
                 @csrf
@@ -167,14 +177,14 @@
                 <div class="mb-3">
                     <label class="block text-sm">Sizes & Stock</label>
                     <div id="sizes-wrapper" class="space-y-2">
-                       @foreach($sizeNames as $key => $label)
-                           <div class="flex items-center space-x-2">
-                               <input type="checkbox" id="size_{{ $key }}" name="sizes[]" value="{{ $key }}" onclick="toggleStockInput('{{ $key }}')">
-                               <label for="size_{{ $key }}" class="flex-grow">{{ $label }}</label>
-                               <input type="number" name="stock[{{ $key }}]" id="stock_{{ $key }}" placeholder="Stock for {{ $label }}"
-                                      class="ml-4 px-2 py-1 border rounded w-32 hidden" min="0">
-                           </div>
-                       @endforeach
+                    @foreach($sizeNames as $key => $label)
+                        <div class="flex items-center space-x-2">
+                            <input type="checkbox" id="size_{{ $key }}" name="sizes[]" value="{{ $key }}" onclick="toggleStockInput('{{ $key }}')">
+                            <label for="size_{{ $key }}" class="flex-grow">{{ $label }}</label>
+                            <input type="number" name="stock[{{ $key }}]" id="stock_{{ $key }}" placeholder="Stock for {{ $label }}"
+                                    class="ml-4 px-2 py-1 border rounded w-32 hidden" min="0">
+                        </div>
+                    @endforeach
                     </div>
                 </div>
 
@@ -184,13 +194,14 @@
                     <input type="file" name="image" class="w-full border p-2 rounded">
                 </div>
 
-                <div class="flex justify-end space-x-2">
+                <div class="flex justify-end space-x-2 sticky bottom-0 bg-white pt-2">
                     <button type="button" onclick="closeModal('edit-modal')" class="bg-gray-300 px-3 py-1 rounded">Cancel</button>
                     <button type="submit" class="bg-blue-500 text-white px-3 py-1 rounded">Save</button>
                 </div>
             </form>
         </div>
     </div>
+
 
     <!-- Delete Modal -->
     <div id="delete-modal" class="modal">
@@ -214,7 +225,14 @@
             input.classList.toggle('hidden', !checkbox.checked);
         }
 
-        function openEditModal(id, name, desc, price, image, sizes) {
+        function openEditModal(button) {
+            const id = button.dataset.id;
+            const name = button.dataset.name;
+            const desc = button.dataset.desc;
+            const price = button.dataset.price;
+            const image = button.dataset.image;
+
+            // Set form action and values
             const form = document.getElementById('edit-product-form');
             form.action = `/products/${id}`;
             document.getElementById('product-id').value = id;
@@ -223,24 +241,23 @@
             document.getElementById('product-price').value = price;
             document.getElementById('product-image-preview').src = '/storage/' + image;
 
-            Object.keys({!! json_encode($sizeNames) !!}).forEach(size => {
+            // Reset sizes: all unchecked, stock = 0, hidden
+            Object.keys(@json($sizeNames)).forEach(size => {
                 const checkbox = document.getElementById('size_' + size);
                 const input = document.getElementById('stock_' + size);
-                if (sizes.hasOwnProperty(size)) {
-                    checkbox.checked = true;
-                    input.classList.remove('hidden');
-                    input.value = sizes[size];
-                } else {
-                    checkbox.checked = false;
-                    input.classList.add('hidden');
-                    input.value = '';
-                }
+
+                checkbox.checked = false;
+                input.classList.add('hidden');
+                input.value = 0;
             });
 
+            // Show modal
             document.getElementById('edit-modal').classList.add('active');
         }
 
-        function openDeleteModal(id) {
+
+        function openDeleteModal(button) {
+            const id = button.dataset.id;
             const form = document.getElementById('delete-form');
             form.action = `/products/delete/${id}`;
             document.getElementById('delete-modal').classList.add('active');
