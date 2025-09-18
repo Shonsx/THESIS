@@ -150,7 +150,7 @@ class ProductController extends Controller
             $product->save();
         }
 
-        return redirect()->route('products.index')->with('success', 'Product updated successfully!');
+        return redirect()->route('admin.index')->with('success', 'Product updated successfully!');
     }
 
 
@@ -207,7 +207,7 @@ class ProductController extends Controller
             ]);
         }
 
-        return redirect()->route('products.index')->with('success', 'Product added!');
+        return redirect()->route('admin.index')->with('success', 'Product added!');
     }
 
 
@@ -239,7 +239,7 @@ class ProductController extends Controller
 
         $product->delete();
         
-        return redirect()->route('products.index')
+        return redirect()->route('admin.index')
                      ->with('success', 'Product deleted successfully.');
     }
 
