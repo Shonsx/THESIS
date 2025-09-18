@@ -30,7 +30,7 @@
                             </li>
                         @elseif(auth()->user()->role == 'manager/staff')
                             <li>
-                                <a href="{{ route('cashier.main') }}" class="w-30 px-4 py-2 border bg-[#8c8c8c] text-center text-white rounded-xl transition duration-500 hover:bg-[#00c7c7] hover:text-white">Orders</a>
+                                <a href="{{ route('cashier.main') }}" class="w-30 px-4 py-2 border bg-[#8c8c8c] text-center text-white rounded-xl transition duration-500 hover:bg-[#00c7c7] hover:text-white">Pending Orders</a>
                             </li>
                         @endif
                     @endif
@@ -62,7 +62,7 @@
                     @auth
                         <div class="relative">
                             <button class="focus:outline-none" onclick="toggleNotifications()" aria-expanded="false">
-                                <img src="{{ asset('icons/bell-notification.svg') }}" alt="Notification Bell" class="w-8 h-8 cursor-pointer">
+                                <img src="{{ asset('icons/bell-notification.svg') }}" alt="Notification Bell" class="w-7 h-7 cursor-pointer">
                             </button>
                             <!-- Notification Count Badge -->
                             @if(auth()->check() && optional(auth()->user())->unreadNotifications->count() > 0)
