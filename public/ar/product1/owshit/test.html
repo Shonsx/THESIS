@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>MediaPipe Pose + Unity Integration</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+    }
+
+    #unity-container {
+      position: relative;
+      width: 640px;
+      height: 480px;
+    }
+
+    video.input_video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 640px;
+      height: 480px;
+      z-index: 1;
+      object-fit: cover;
+      background: black;
+      display: block;
+    }
+
+    canvas#output_canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 640px;
+      height: 480px;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    canvas#unity-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 640px;
+      height: 480px;
+      z-index: 3;
+      background: transparent;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="unity-container">
+    <video class="input_video" autoplay muted playsinline></video>
+    <canvas id="output_canvas" width="640" height="480"></canvas>
+    <canvas id="unity-canvas"></canvas>
+  </div>
+
+  <!-- MediaPipe & Unity -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+  <script src="Build/owshit.loader.js"></script>
+
+  <script>
+    const videoElement = document.querySelector('.input_video');
+    const canvasElement = document.getElementById('output_canvas');
+    const canvasCtx = canvasElement.getContext('2d');
+
+    async function startCamera() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        videoElement.srcObject = stream;
+        await videoElement.play();
+        console.log("Camera started");
+      } catch (e) {
+        console.error("Camera error:", e);
+        alert("Cannot access camera: " + e.message);
+      }
+    }
+
+    const pose = new Pose({
+      locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`
+    });
+
+    pose.setOptions({
+      modelComplexity: 1,
+      smoothLandmarks: true,
+      enableSegmentation: false,
+      minDetectionConfidence: 0.5,
+      minTrackingConfidence: 0.5,
+    });
+
+    pose.onResults(results => {
+      canvasCtx.save();
+      canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+      canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+
+      if (results.poseLandmarks) {
+        window.drawConnectors(canvasCtx, results.poseLandmarks, window.POSE_CONNECTIONS, {color: '#00FF00', lineWidth: 2});
+        window.drawLandmarks(canvasCtx, results.poseLandmarks, {color: '#FF0000', lineWidth: 1});
+
+        if (window.unityInstance) {
+          const l = results.poseLandmarks;
+          const data = `${l[11].x.toFixed(4)},${l[11].y.toFixed(4)},${l[12].x.toFixed(4)},${l[12].y.toFixed(4)}`;
+          window.unityInstance.SendMessage('BodyTracker', 'UpdateShoulders', data);
+        }
+      }
+      canvasCtx.restore();
+    });
+
+    async function runPose() {
+      await startCamera();
+
+      async function detectPose() {
+        if (videoElement.readyState >= 2) {
+          await pose.send({ image: videoElement });
+        }
+        requestAnimationFrame(detectPose);
+      }
+
+      detectPose();
+    }
+
+    runPose();
+
+    createUnityInstance(document.getElementById("unity-canvas"), {
+      dataUrl: "Build/owshit.data",
+      frameworkUrl: "Build/owshit.framework.js",
+      codeUrl: "Build/owshit.wasm",
+    }).then((unityInstance) => {
+      window.unityInstance = unityInstance;
+      console.log("Unity loaded");
+    }).catch((message) => {
+      console.error("Failed to load Unity:", message);
+    });
+  </script>
+
+</body>
+</html>

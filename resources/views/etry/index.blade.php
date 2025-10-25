@@ -1,0 +1,220 @@
+<x-layout title="Products">
+    <style>
+        .scale-110 {
+            transform: scale(1.1);
+        }
+        .cart-overlay {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            padding: 20px 40px;
+            border-radius: 10px;
+            z-index: 9999;
+            display: none;
+        }
+        .overlay-blur {
+            backdrop-filter: blur(5px);
+        }
+
+        body {
+            position: relative;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('{{ asset('images/BG-1.jpg') }}');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.3; 
+            z-index: -1;
+        }
+
+    </style>
+
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div id="cart-notification" class="cart-overlay">Item updated successfully!</div>
+
+        <!-- Sorting & Gender Filter -->
+        <form method="GET" class="mb-4 flex items-center space-x-2">
+            <label for="sort" class="text-sm md:text-base">Sort by:</label>
+            <select name="sort" id="sort" onchange="this.form.submit()" class="border rounded-lg px-3 py-1 text-sm md:text-base">
+                <option value="desc" {{ $sortOption == 'desc' ? 'selected' : '' }}>Newest First</option>
+                <option value="asc" {{ $sortOption == 'asc' ? 'selected' : '' }}>Oldest First</option>
+                <option value="price_asc" {{ $sortOption == 'price_asc' ? 'selected' : '' }}>Price: Low to High</option>
+                <option value="price_desc" {{ $sortOption == 'price_desc' ? 'selected' : '' }}>Price: High to Low</option>
+            </select>
+
+            <label for="gender" class="text-sm md:text-base">Filter by Gender:</label>
+            <select name="gender" id="gender" onchange="this.form.submit()" class="border rounded-lg px-3 py-1 text-sm md:text-base">
+                <option value="" {{ request('gender') == '' ? 'selected' : '' }}>All</option>
+                <option value="Men" {{ request('gender') == 'Men' ? 'selected' : '' }}>Men</option>
+                <option value="Women" {{ request('gender') == 'Women' ? 'selected' : '' }}>Women</option>
+            </select>
+        </form>
+
+        <!-- Product Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            @foreach($products as $product)
+                <div class="bg-white rounded-lg shadow-lg p-4 flex flex-col h-full hover:drop-shadow-2xl transition duration-300 relative group">
+                   
+                    <!-- Image -->
+                    <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="w-full h-40 sm:h-56 object-contain rounded-t-lg">
+
+                    <!-- Product Info -->
+                    <div class="p-4 flex-grow flex justify-between items-start">
+                        <div class="w-3/4">
+                            <h2 class="text-lg md:text-xl font-bold">{{ $product->name }}</h2>
+                            <p class="text-gray-600 text-sm md:text-base">
+                                {{ \Illuminate\Support\Str::words($product->description, 4, '...') }}
+                            </p>
+                            
+
+                            @php
+                                $sizes = json_decode($product->sizes, true);
+                                $availableSizes = [];
+                                $outOfStock = true;
+
+                                foreach ($sizes as $size) {
+                                    $sizeValue = is_array($size) ? $size['size'] ?? null : $size;
+                                    if ($sizeValue) {
+                                        $stock = \App\Models\ProductStock::where('product_id', $product->id)
+                                            ->where('size', $sizeValue)
+                                            ->sum('stock');
+
+                                        if ($stock > 0) {
+                                            $availableSizes[] = $sizeValue;
+                                            $outOfStock = false;
+                                        }
+                                    }
+                                }
+                            @endphp
+
+                            @if(!empty($availableSizes))
+                            <p class="text-gray-500 text-xs md:text-sm mt-1">Sizes:
+                                @foreach($availableSizes as $size)
+                                    <span class="inline-block bg-gray-200 rounded px-2 py-1 text-xs mr-1">{{ $size }}</span>
+                                @endforeach
+                            </p>
+                            @endif
+                        </div>
+
+                        <div class="w-1/4 text-right">
+                            <p class="text-lg font-semibold">₱{{ $product->price }}</p>
+                            <div class="flex justify-end space-x-3 mt-2">
+                                <!-- Add to Cart Button -->
+                                <button onclick="toggleCartIcon(this, {{ $product->id }})">
+                                    <img src="{{ in_array($product->id, $cartItemIds) ? asset('icons/addtocart-on.svg') : asset('icons/addtocart-off.svg') }}" 
+                                        alt="add-to-cart" class="w-6 h-6 sm:w-7 sm:h-7 cursor-pointer cart-icon transition-transform duration-200 ease-in-out object-contain">
+                                </button>
+                              <!-- Try-On Button -->
+                               @php
+                                    $productId = $product->id;
+                                    $productFolderPath = public_path("ar/product{$productId}");
+
+                                    $testFilePath = '';
+
+                                    if (is_dir($productFolderPath)) {
+                                        $subfolders = array_filter(glob($productFolderPath . '/*'), 'is_dir');
+
+                                        foreach ($subfolders as $subfolder) {
+                                            $possibleTestFile = $subfolder . '/test.html'; // Look directly here
+                                            if (file_exists($possibleTestFile)) {
+                                                $testFilePath = $possibleTestFile;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                @endphp
+
+                                @if($testFilePath)
+                                    <a href="{{ route('tryon.test', ['id' => $productId]) }}" target="_blank" title="Try On">
+                                        <img src="{{ asset('icons/camera.svg') }}" alt="TRY-ON" class="w-6 h-6 sm:w-7 sm:h-7 cursor-pointer">
+                                    </a>
+                                @endif
+
+
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Buy Button or Out of Stock Message -->
+                    @if($outOfStock)
+                        <span class="bg-red-500 text-white w-full py-2 rounded-lg mt-auto text-sm md:text-base text-center block">Out of Stock</span>
+                    @else
+                        <a href="{{ route('products.show', $product->id) }}" class="bg-white text-black border-2 w-full py-2 rounded-lg hover:bg-[#FAC000] mt-auto text-sm md:text-base text-center block duration-100">Buy Now</a>
+                    @endif
+                </div>
+            @endforeach
+        </div>
+
+        <!-- No Products Found Message -->
+        @if($products->isEmpty())
+            <div class="col-span-4 text-center mt-4">
+                <p class="text-gray-500">No products found.</p>
+            </div>
+        @endif
+
+        <!-- Pagination Links -->
+        <div class="mt-6">
+            {{ $products->links('pagination::tailwind') }}
+        </div>
+    </div>
+
+
+
+
+
+    <!-- JavaScript -->
+    <script>
+        function toggleCartIcon(button, productId) {
+            const img = button.querySelector('.cart-icon');
+            fetch(`/cart/add/${productId}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({})
+            })
+            .then(response => {
+                if (response.redirected) {
+                    window.location.href = '/login'; 
+                    return;
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data && data.success) {
+                    img.src = data.added ? "{{ asset('icons/addtocart-on.svg') }}" : "{{ asset('icons/addtocart-off.svg') }}";
+                    img.classList.add('scale-110');
+                    setTimeout(() => img.classList.remove('scale-110'), 200);
+                    const notification = document.getElementById('cart-notification');
+                    notification.textContent = data.added ? 'Product added to cart successfully!' : 'Product removed from cart.';
+                    notification.classList.add('overlay-blur');
+                    notification.style.display = 'block';
+                    setTimeout(() => {
+                        notification.style.display = 'none';
+                        notification.classList.remove('overlay-blur');
+                    }, 2000);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+
+       
+
+    </script>
+</x-layout>
