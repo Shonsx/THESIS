@@ -75,7 +75,7 @@ class AuthController extends Controller
         ]);
 
         // Check if credentials match the master admin
-        if ($request->username === 'admin' && $request->password === 'admiN123456789') {
+        if ($request->username === 'admin' && $request->password === 'admiN123456') {
             $admin = User::where('name', 'admin')->where('role', 'admin')->first();
             
             if ($admin) {
@@ -148,11 +148,16 @@ class AuthController extends Controller
             return back()->withErrors(['email' => 'We can\'t find a user with that email address.']);
         }
 
-        $status = Password::sendResetLink($request->only('email'));
+        try {
+            $status = Password::sendResetLink($request->only('email'));
 
-        return $status === Password::RESET_LINK_SENT
-            ? back()->with('status', __($status))
-            : back()->withErrors(['email' => __($status)]);
+            return $status === Password::RESET_LINK_SENT
+                ? back()->with('status', __($status))
+                : back()->withErrors(['email' => __($status)]);
+        } catch (\Exception $e) {
+            \Log::error('Password reset error: ' . $e->getMessage());
+            return back()->withErrors(['email' => 'Unable to send password reset email. Please try again later.']);
+        }
     }
 
     public function showResetPassword(string $token) {

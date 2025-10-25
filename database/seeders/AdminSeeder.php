@@ -18,7 +18,7 @@ class AdminSeeder extends Seeder
             User::create([
                 'name' => 'admin',
                 'email' => 'admin@temp.com', // Temporary email, will be updated on first login
-                'password' => Hash::make('admiN123456789'),
+                'password' => Hash::make('admiN123456'),
                 'tel' => null, // Will be set on first login
                 'role' => 'admin',
                 'first_login' => true, // Flag to track first login
