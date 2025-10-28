@@ -115,11 +115,48 @@ Route::get('/gcash', [GCashController::class, 'index'])->name('gcash.index');
 Route::post('/gcash', [GCashController::class, 'store'])->name('gcash.store');
 
 // Serve files from storage/app/public without relying on web server symlink
+// More tolerant: accepts paths like "products/foo.webp", "storage/products/foo.webp", or just "foo.webp"
 Route::get('/files/{path}', function (string $path) {
-    $full = storage_path('app/public/' . $path);
-    if (!\Illuminate\Support\Facades\File::exists($full)) {
+    $root = storage_path('app/public');
+    $path = ltrim($path, '/');
+
+    // Helper to resolve a candidate under public storage
+    $resolve = function (string $candidate) use ($root) {
+        $full = $root . '/' . $candidate;
+        if (!\Illuminate\Support\Facades\File::exists($full)) {
+            return null;
+        }
+        $real = realpath($full);
+        if (!$real || strpos($real, $root) !== 0) {
+            return null; // prevent path traversal
+        }
+        return $real;
+    };
+
+    // Try exact path first
+    $full = $resolve($path);
+
+    // Strip common wrong prefixes (e.g., "storage/")
+    if (!$full) {
+        $stripped = preg_replace('#^(?:storage/)+#', '', $path);
+        if ($stripped !== $path) {
+            $full = $resolve($stripped);
+        }
+    }
+
+    // Try buckets with basename fallback
+    if (!$full) {
+        $name = basename($path);
+        foreach (['products', 'measurements', 'gcash', 'payment_proofs'] as $bucket) {
+            $full = $resolve($bucket . '/' . $name);
+            if ($full) break;
+        }
+    }
+
+    if (!$full) {
         abort(404);
     }
+
     $mime = \Illuminate\Support\Facades\File::mimeType($full) ?: 'application/octet-stream';
     return response()->file($full, ['Content-Type' => $mime]);
 })->where('path', '.*')->name('files.public');
