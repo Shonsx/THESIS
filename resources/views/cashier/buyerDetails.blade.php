@@ -44,7 +44,7 @@
 
             @if ($order->payment_proof_path)
                 <p><strong>Proof of Payment:</strong></p>
-                <img src="{{ asset('storage/' . $order->payment_proof_path) }}" alt="Proof of Payment" class="mt-2 rounded border shadow-md w-full max-w-xs">
+                <img src="{{ route('files.public', ['path' => $order->payment_proof_path]) }}" alt="Proof of Payment" class="mt-2 rounded border shadow-md w-full max-w-xs">
             @else
                 <p><strong>Proof of Payment:</strong> Not uploaded</p>
             @endif

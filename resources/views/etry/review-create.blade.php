@@ -3,7 +3,7 @@
         <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 w-full py-10">
             <div class="bg-white rounded-lg shadow-2xl p-6 md:p-8">
                 <div class="flex items-center space-x-4 mb-6">
-                    <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="w-20 h-20 object-contain rounded">
+                    <img src="{{ route('files.public', ['path' => $product->image]) }}" alt="{{ $product->name }}" class="w-20 h-20 object-contain rounded">
                     <div>
                         <h2 class="text-2xl font-bold">Review: {{ $product->name }}</h2>
                         <p class="text-gray-600">Share your thoughts and help others decide.</p>
