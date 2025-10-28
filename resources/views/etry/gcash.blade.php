@@ -11,7 +11,7 @@
         @if($gcash?->image_path)
             <div class="mb-6 text-center">
                 <h5 class="font-semibold mb-3">Current GCash Image:</h5>
-                <img src="{{ asset('storage/' . $gcash->image_path) }}" alt="GCash QR"
+                <img src="{{ url('/files/' . $gcash->image_path) }}" alt="GCash QR"
                      class="mx-auto rounded shadow max-w-xs">
             </div>
         @else

@@ -114,6 +114,16 @@ Route::get('/etry/gcash', function () {
 Route::get('/gcash', [GCashController::class, 'index'])->name('gcash.index');
 Route::post('/gcash', [GCashController::class, 'store'])->name('gcash.store');
 
+// Serve files from storage/app/public without relying on web server symlink
+Route::get('/files/{path}', function (string $path) {
+    $full = storage_path('app/public/' . $path);
+    if (!\Illuminate\Support\Facades\File::exists($full)) {
+        abort(404);
+    }
+    $mime = \Illuminate\Support\Facades\File::mimeType($full) ?: 'application/octet-stream';
+    return response()->file($full, ['Content-Type' => $mime]);
+})->where('path', '.*')->name('files.public');
+
 
 
 // ACCOUNT EDIT
