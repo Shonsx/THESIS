@@ -47,6 +47,16 @@ return [
             'report' => false,
         ],
 
+        // Public-facing assets stored directly under public/images
+        'assets' => [
+            'driver' => 'local',
+            'root' => public_path('images'),
+            'url' => env('APP_URL') . '/images',
+            'visibility' => 'public',
+            'throw' => false,
+            'report' => false,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

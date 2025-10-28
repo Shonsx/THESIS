@@ -21,7 +21,7 @@
                                     <input type="checkbox" name="selected_items[]" value="{{ $item->id }}" 
                                            class="cart-checkbox mr-3 w-5 h-5">
 
-                                    <img src="{{ asset('storage/' . $item->product->image) }}" 
+                                    <img src="{{ asset('images/' . $item->product->image) }}" 
                                          alt="{{ $item->product->name }}" 
                                          class="w-24 h-24 object-cover rounded">
 
@@ -80,7 +80,7 @@
                                     <tr>
                                         <td class="border px-4 py-2 text-center">
                                             @if($order->product && $order->product->image)
-                                                <img src="{{ Storage::url($order->product->image) }}" 
+                                                <img src="{{ asset('images/' . $order->product->image) }}" 
                                                     alt="{{ $order->product->name }}" 
                                                     class="mx-auto w-16 h-16 object-cover rounded" />
                                             @else

@@ -217,27 +217,28 @@ use App\Models\Order;
 
         // Handle the image update
          if ($request->hasFile('image')) {
-             // Delete the old image if it exists
-             if ($product->image && file_exists(public_path('storage/' . $product->image))) {
-                 @unlink(public_path('storage/' . $product->image));
+             // Delete the old image if it exists under public/images
+             if ($product->image && \Illuminate\Support\Facades\Storage::disk('assets')->exists($product->image)) {
+                 \Illuminate\Support\Facades\Storage::disk('assets')->delete($product->image);
              }
 
-             // Upload the new image
-             $imagePath = $request->file('image')->store('products', 'public');
+             // Upload the new image directly to public/images/products
+             $imagePath = $request->file('image')->store('products', 'assets');
              $product->image = $imagePath;
              $product->save();
          }
 
          // Handle measurement image update
          if ($request->hasFile('measurement_image')) {
-             if ($product->measurement_image && file_exists(public_path('storage/' . $product->measurement_image))) {
-                 @unlink(public_path('storage/' . $product->measurement_image));
+             // Delete the old measurement image under public/images
+             if ($product->measurement_image && \Illuminate\Support\Facades\Storage::disk('assets')->exists($product->measurement_image)) {
+                 \Illuminate\Support\Facades\Storage::disk('assets')->delete($product->measurement_image);
              }
              $file = $request->file('measurement_image');
              $filename = $file->getClientOriginalName();
              $storagePath = 'measurements/' . $filename;
-             if (!Storage::disk('public')->exists($storagePath)) {
-                 $file->storeAs('measurements', $filename, 'public');
+             if (!\Illuminate\Support\Facades\Storage::disk('assets')->exists($storagePath)) {
+                 $file->storeAs('measurements', $filename, 'assets');
              }
              $product->measurement_image = $storagePath;
              $product->save();
@@ -262,8 +263,8 @@ use App\Models\Order;
             'gender' => 'required|in:Men,Women',
         ]);
 
-        // Handle product image
-        $imagePath = $request->file('image')?->store('products', 'public');
+        // Handle product image (store under public/images)
+        $imagePath = $request->file('image')?->store('products', 'assets');
 
         $measurementImagePath = null;
         if ($request->hasFile('measurement_image')) {
@@ -272,9 +273,9 @@ use App\Models\Order;
             $storagePath = 'measurements/' . $filename;
 
             // Check if the file already exists
-            if (!Storage::disk('public')->exists($storagePath)) {
-                // If not exists, store it
-                $file->storeAs('measurements', $filename, 'public');
+            if (!Storage::disk('assets')->exists($storagePath)) {
+                // If not exists, store it under public/images
+                $file->storeAs('measurements', $filename, 'assets');
             }
 
             // Either way, set the path
@@ -334,7 +335,9 @@ use App\Models\Order;
 
         // Delete image if needed
         if ($product->image) {
-            Storage::delete('public/' . $product->image);
+            if (Storage::disk('assets')->exists($product->image)) {
+                Storage::disk('assets')->delete($product->image);
+            }
         }
 
         $product->delete();
