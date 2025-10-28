@@ -34,7 +34,7 @@
                 <div class="bg-white rounded-lg shadow-2xl p-6 md:p-8 grid grid-cols-1 gap-6 items-stretch h-full">
                     <!-- Product Image -->
                     <div class="relative w-full flex items-center justify-center overflow-hidden h-[380px] sm:h-[420px] md:h-[480px] rounded-lg">
-                        <img src="{{ asset('storage/' . $product->image) }}"
+                        <img src="{{ Storage::url($product->image) }}"
                             alt="{{ $product->name }}"
                             class="w-full h-full object-contain rounded-lg transition-transform duration-300 ease-out hover:scale-110 cursor-zoom-in" />
                     </div>

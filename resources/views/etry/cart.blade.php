@@ -80,7 +80,7 @@
                                     <tr>
                                         <td class="border px-4 py-2 text-center">
                                             @if($order->product && $order->product->image)
-                                                <img src="{{ asset('storage/' . $order->product->image) }}" 
+                                                <img src="{{ Storage::url($order->product->image) }}" 
                                                     alt="{{ $order->product->name }}" 
                                                     class="mx-auto w-16 h-16 object-cover rounded" />
                                             @else

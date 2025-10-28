@@ -36,9 +36,8 @@
                 </p>
                 <div class="text-center sm:text-right w-full sm:w-1/2">
                     <p class="text-sm">Subtotal: ₱<span id="subtotal-price">0.00</span></p>
-                    <p class="text-sm">Shipping Fee: ₱<span id="shipping-fee">30.00</span></p>
                     <p class="text-xl font-bold">Total: ₱<span id="total-price">0.00</span></p>
-                    <button type="submit" class="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600 mt-2 sm:mt-1">
+                    <button type="submit" class="hidden sm:inline-block bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600 mt-2 sm:mt-1">
                         Buy Now
                     </button>
                 </div>
@@ -146,6 +145,19 @@
                     </div>
                 </div>
             </div>
+            <!-- Mobile fixed bottom action bar -->
+            <div class="sm:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur border-t border-gray-200 p-3 z-50">
+                <div class="flex items-center justify-between">
+                    <div class="text-sm">
+                        <span class="font-semibold">Total:</span>
+                        ₱<span id="total-price-mobile">0.00</span>
+                    </div>
+                    <button type="submit" class="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600">
+                        Buy Now
+                    </button>
+                </div>
+            </div>
+
         </form>
     </div>
 
@@ -185,13 +197,10 @@
             const subtotalEl = document.getElementById('subtotal-price');
             if (subtotalEl) subtotalEl.innerText = total.toFixed(2);
 
-            // Shipping fee (₱30 if there is at least one item)
-            const shippingFee = itemCount > 0 ? 30 : 0;
-            const shippingEl = document.getElementById('shipping-fee');
-            if (shippingEl) shippingEl.innerText = shippingFee.toFixed(2);
-
-            // Update total (subtotal + shipping)
-            document.getElementById('total-price').innerText = (total + shippingFee).toFixed(2);
+            // Update total (no shipping fee)
+            document.getElementById('total-price').innerText = total.toFixed(2);
+            const totalMobileEl = document.getElementById('total-price-mobile');
+            if (totalMobileEl) totalMobileEl.innerText = total.toFixed(2);
             document.getElementById('total-items').innerText = itemCount;
         }
 
