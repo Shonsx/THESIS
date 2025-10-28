@@ -66,7 +66,7 @@
                     @foreach($products as $product)
                         <div class="min-w-[250px] max-w-[250px] h-[250px] bg-white border rounded-lg shadow-lg overflow-hidden relative group/item hover:scale-105 transition-transform duration-300">
                             <!-- Product Image -->
-                    <img src="{{ route('media.show', $product->image) }}" alt="{{ $product->name }}" class="w-full h-48 object-contain">
+                    <img src="{{ Storage::url($product->image) }}" alt="{{ $product->name }}" class="w-full h-48 object-contain">
 
                             <!-- Blur Overlay on Hover -->
                             <div class="absolute inset-0 backdrop-blur-sm bg-white/30 opacity-0 group-hover/item:opacity-100 transition-opacity duration-300 flex items-center justify-center">

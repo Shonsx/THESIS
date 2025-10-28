@@ -52,7 +52,7 @@
                         <input type="hidden" name="product_id" value="{{ $product->id }}">
 
                         <div class="bg-white rounded-lg shadow-lg p-4 flex flex-col sm:flex-row items-center mb-4">
-                        <img src="{{ route('media.show', $product->image) }}" alt="{{ $product->name }}" class="w-full sm:w-[180px] h-auto object-cover rounded">
+                        <img src="{{ Storage::url($product->image) }}" alt="{{ $product->name }}" class="w-full sm:w-[180px] h-auto object-cover rounded">
                             <div class="sm:ml-4 mt-4 sm:mt-0 flex-grow w-full">
                                 <h2 class="text-lg font-bold">{{ $product->name }}</h2>
                                 <p class="text-gray-600">{{ $product->description }}</p>
@@ -79,7 +79,7 @@
                         <input type="hidden" name="type" value="cart">
                         @foreach($cartItems as $item)
                         <div class="bg-white rounded-lg shadow-lg p-4 flex flex-col sm:flex-row items-center mb-4">
-                        <img src="{{ route('media.show', $item->product->image) }}" alt="{{ $item->product->name }}" class="w-full sm:w-[180px] h-auto object-cover rounded">
+                        <img src="{{ Storage::url($item->product->image) }}" alt="{{ $item->product->name }}" class="w-full sm:w-[180px] h-auto object-cover rounded">
                             <div class="sm:ml-4 mt-4 sm:mt-0 flex-grow w-full">
                                 <h2 class="text-lg font-bold">{{ $item->product->name }}</h2>
                                 <p class="text-gray-600">{{ $item->product->description }}</p>
@@ -135,7 +135,7 @@
                         <h2 class="text-lg font-bold mb-2 text-center">Pay with GCash</h2>
 
                         @if(isset($gcash) && $gcash->image_path && file_exists(storage_path('app/public/' . $gcash->image_path)))
-                            <img src="{{ route('media.show', $gcash->image_path) }}" alt="GCash QR" class="w-full max-h-[300px] object-contain mb-2" />
+                            <img src="{{ Storage::url($gcash->image_path) }}" alt="GCash QR" class="w-full max-h-[300px] object-contain mb-2" />
                         @else
                             <p class="text-center text-sm">GCash image not available</p>
                         @endif
