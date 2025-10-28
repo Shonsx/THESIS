@@ -16,10 +16,10 @@ class CartController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        $user = Auth::user();
+        $userId = Auth::id();
 
         // Check if the product is already in the cart
-        $cartItem = Cart::where('user_id', $user->id)
+        $cartItem = Cart::where('user_id', $userId)
                         ->where('product_id', $id)
                         ->first();
 
@@ -30,7 +30,7 @@ class CartController extends Controller
         } else {
             // Add to cart if not yet added
             Cart::create([
-                'user_id' => $user->id,
+                'user_id' => $userId,
                 'product_id' => $id,
                 'quantity' => 1
             ]);
@@ -47,18 +47,17 @@ class CartController extends Controller
     // Display the cart view
     public function show(Request $request)
     {
-        /** @var \Illuminate\Contracts\Auth\Authenticatable $user */
-        $user = Auth::user();
+        $userId = Auth::id();
 
         // Get current page for each section or default to 1
         $cartPage = $request->get('cart_page', 1);
         $orderPage = $request->get('order_page', 1);
 
         // Paginate cart items separately for cart
-        $cartItems = Cart::where('user_id', $user->id)->paginate(3, ['*'], 'cart_page', $cartPage);
+        $cartItems = Cart::where('user_id', $userId)->paginate(3, ['*'], 'cart_page', $cartPage);
 
         // Paginate order history separately for orders
-        $userOrders = Order::where('user_id', $user->id)
+        $userOrders = Order::where('user_id', $userId)
                             ->with('product')
                             ->latest()
                             ->paginate(4, ['*'], 'order_page', $orderPage);
@@ -87,7 +86,7 @@ class CartController extends Controller
     public function checkout(Request $request){
         $selectedItems = explode(',', $request->query('items', ''));
         $productId = $request->query('productId'); // NEW: for direct product purchase
-        $gcash = Gcash::latest()->first();
+        $gcash = GCash::latest()->first();
 
         // For single product checkout
         if ($productId) {

@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\MediaController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductController;
@@ -18,6 +19,10 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Response;
 
 Route::get('/', [HomeController::class, 'index'])->name('welcome');
+// Proxy route for serving files from the public disk to avoid server 403s on /storage
+Route::get('/media/{path}', [MediaController::class, 'show'])
+    ->where('path', '.*')
+    ->name('media.show');
 Route::get('/admin', [ProductController::class, 'indexAdmin'])
     ->name('admin.index')
     ->middleware('auth');
