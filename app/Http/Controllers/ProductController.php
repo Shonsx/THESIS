@@ -13,9 +13,12 @@ use App\Models\ProductStock;
 use App\Models\SiteVisit;
 use App\Models\Order;
 
-class ProductController extends Controller
-{
+    class ProductController extends Controller
+    {
     public function create() {
+        if (!Auth::check() || Auth::user()->role !== 'admin') {
+            abort(403, 'Unauthorized');
+        }
         return view('etry.addProduct');
     }
 
@@ -246,6 +249,9 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
+        if (!Auth::check() || Auth::user()->role !== 'admin') {
+            abort(403, 'Unauthorized');
+        }
         $request->validate([
             'name' => 'required|string',
             'price' => 'required|numeric',

@@ -160,7 +160,7 @@
         
             <!-- Mobile Menu -->
         <ul id="mobile-menu" class="hidden flex-col items-center space-y-4 mt-4 bg-[#000000] p-4 rounded-lg w-full">
-            @if(auth()->check() && auth()->user()->id == 1)
+            @if(auth()->check() && auth()->user()->role == 'admin')
                 <li>
                     <a href="{{ route('addProduct') }}" class="w-30 px-4 py-2 border bg-[#8c8c8c] text-center text-white rounded-xl transition duration-500 hover:bg-[#00c7c7] hover:text-black">
                         Add Product

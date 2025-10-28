@@ -93,8 +93,10 @@ Route::middleware('guest')->group(function () {
     Route::post('/admin/forgot-password', [AuthController::class, 'resetAdminPassword'])->name('admin.password.update');
 });
 
-Route::get('/addProduct', [ProductController::class, 'create'])->name('addProduct');
-Route::post('/addProduct', [ProductController::class, 'store'])->name('addProduct.store');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/addProduct', [ProductController::class, 'create'])->name('addProduct');
+    Route::post('/addProduct', [ProductController::class, 'store'])->name('addProduct.store');
+});
 Route::get('/products/{id}', [ProductController::class, 'show'])->name('products.show');
 // Reviews
 Route::middleware(['auth'])->group(function () {
