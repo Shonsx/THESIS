@@ -34,7 +34,7 @@
                 <div class="bg-white rounded-lg shadow-2xl p-6 md:p-8 grid grid-cols-1 gap-6 items-stretch h-full">
                     <!-- Product Image -->
                     <div class="relative w-full flex items-center justify-center overflow-hidden h-[380px] sm:h-[420px] md:h-[480px] rounded-lg">
-                        <img src="{{ asset('images/' . $product->image) }}"
+                        <img src="{{ asset('storage/' . $product->image) }}"
                             alt="{{ $product->name }}"
                             class="w-full h-full object-contain rounded-lg transition-transform duration-300 ease-out hover:scale-110 cursor-zoom-in" />
                     </div>
@@ -110,7 +110,7 @@
                     <div class="bg-white rounded-lg shadow-lg p-4 md:p-6 h-full">
                         <h3 class="text-xl font-bold mb-3 text-center">Measurement Guide</h3>
                         <div class="relative w-full h-[380px] sm:h-[420px] md:h-[480px] overflow-hidden rounded border border-gray-300 flex items-center justify-center">
-                            <img src="{{ asset('images/' . $product->measurement_image) }}" 
+                            <img src="{{ asset('storage/' . $product->measurement_image) }}" 
                                 alt="Measurement Image" class="max-h-full max-w-full object-contain">
                         </div>
                     </div>

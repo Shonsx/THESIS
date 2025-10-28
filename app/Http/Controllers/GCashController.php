@@ -21,12 +21,12 @@ class GCashController extends Controller
         ]);
 
         $file = $request->file('gcash_image');
-        $path = $file->store('gcash', 'assets');
+        $path = $file->store('gcash', 'public');
 
         // Check and delete the old image
         $gcash = GCash::latest()->first();
-        if ($gcash && $gcash->image_path && Storage::disk('assets')->exists($gcash->image_path)) {
-            Storage::disk('assets')->delete($gcash->image_path);
+        if ($gcash && $gcash->image_path && Storage::disk('public')->exists($gcash->image_path)) {
+            Storage::disk('public')->delete($gcash->image_path);
         }
 
         // Update or create new

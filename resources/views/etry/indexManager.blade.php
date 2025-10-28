@@ -98,7 +98,7 @@
                     @endphp
                     <tr>
                         <td class="border border-gray-300 px-4 py-2 text-center">
-                            <img src="{{ asset('images/' . $product->image) }}" alt="{{ $product->name }}" class="w-20 h-20 object-contain mx-auto">
+                            <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="w-20 h-20 object-contain mx-auto">
                         </td>
                         <td class="border border-gray-300 px-4 py-2">{{ $product->name }}</td>
                         <td class="border border-gray-300 px-4 py-2">{{ \Illuminate\Support\Str::words($product->description, 10, '...') }}</td>

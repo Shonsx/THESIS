@@ -69,7 +69,7 @@
                 <div class="bg-white rounded-lg shadow-lg p-4 flex flex-col h-full hover:drop-shadow-2xl transition duration-300 relative group">
                    
                     <!-- Image -->
-            <img src="{{ asset('images/' . $product->image) }}" alt="{{ $product->name }}" class="w-full h-40 sm:h-56 object-contain rounded-t-lg">
+            <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="w-full h-40 sm:h-56 object-contain rounded-t-lg">
 
                     <!-- Product Info -->
                     <div class="p-4 flex-grow flex justify-between items-start">
