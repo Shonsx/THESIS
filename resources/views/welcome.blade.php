@@ -28,10 +28,10 @@
                 <h1 class="text-4xl font-semibold" style="font-family:'Poppins'">WELCOME TO OUR STORE</h1>
                 <p class="text-m mt-2" style="font-family:'Poppins'">Try On Clothes Virtually! Experience our augmented reality feature for a new way of shopping.</p>
                 <div class="flex gap-4 mt-4 w-full">
-                    <a href="" class="w-55 h-12 flex items-center justify-center font-semibold border border-black rounded-lg px-6 transition duration-300 bg-white text-black hover:bg-black hover:text-white">
+                    <a href="/signup" class="w-55 h-12 flex items-center justify-center font-semibold border border-black rounded-lg px-6 transition duration-300 bg-white text-black hover:bg-black hover:text-white">
                         Learn More
                     </a>
-                    <a href="" class="w-55 h-12 flex items-center justify-center font-semibold bg-[#FAC000] text-black rounded-lg px-6 transition duration-300 hover:bg-black hover:text-white">
+                    <a href="{{ route('products.index') }}" class="w-55 h-12 flex items-center justify-center font-semibold bg-[#FAC000] text-black rounded-lg px-6 transition duration-300 hover:bg-black hover:text-white">
                         Explore
                     </a>
                 </div>
@@ -49,7 +49,7 @@
             <div class="w-full md:w-1/2 h-full flex flex-col justify-center text-center md:text-left">
                 <h1 class="text-lg md:text-4xl pb-3 md:pb-5 font-bold" style="font-family: 'Poppins'">Featured Products</h1>
                 <p class="text-sm md:text-lg pb-3 md:pb-5 font-bold" style="font-family: 'Poppins'">Browse our latest collection</p>
-                <a href="" class="!w-[250px] md:w-[200px] h-10 md:h-12 flex items-center justify-center font-semibold bg-[#FAC000] text-white rounded-lg px-4 md:px-6 transition duration-300 hover:bg-black hover:text-white mx-auto md:mx-0">
+                <a href="{{ route('products.index') }}" class="!w-[250px] md:w-[200px] h-10 md:h-12 flex items-center justify-center font-semibold bg-[#FAC000] text-white rounded-lg px-4 md:px-6 transition duration-300 hover:bg-black hover:text-white mx-auto md:mx-0">
                     Shop Now
                 </a>
                 
@@ -89,6 +89,80 @@
             </div>
         </div>
 
+        <!-- Our Store Grid Section -->
+        <section class="w-full bg-white py-12">
+            <div class="max-w-[1200px] mx-auto px-6">
+                <h2 class="text-2xl md:text-4xl font-bold text-center mb-6" style="font-family:'Poppins'">Our store</h2>
+                <p class="text-center text-sm md:text-base mb-10 opacity-80" style="font-family:'Poppins'">Step inside the Halang Branch — where style meets comfort.</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <img src="{{ asset('images/Store1_BG.jpg') }}" alt="Store photo 1" class="w-full h-[240px] md:h-[300px] object-cover rounded-lg shadow hover:scale-[1.02] transition-transform duration-300" />
+                    <img src="{{ asset('images/Store2_BG.jpg') }}" alt="Store photo 2" class="w-full h-[240px] md:h-[300px] object-cover rounded-lg shadow hover:scale-[1.02] transition-transform duration-300" />
+                    <img src="{{ asset('images/Store3_BG.jpg') }}" alt="Store photo 3" class="w-full h-[240px] md:h-[300px] object-cover rounded-lg shadow hover:scale-[1.02] transition-transform duration-300" />
+                    <img src="{{ asset('images/Store4_BG.jpg') }}" alt="Store photo 4" class="w-full h-[240px] md:h-[300px] object-cover rounded-lg shadow hover:scale-[1.02] transition-transform duration-300" />
+                </div>
+            </div>
+        </section>
 
+        <!-- Engaging content below the store photos -->
+        <section class="w-full bg-white pb-14">
+            <div class="max-w-[1200px] mx-auto px-6">
+                <!-- Intro -->
+                <div class="text-center mb-8">
+                    <h3 class="text-xl md:text-3xl font-bold" style="font-family:'Poppins'">Discover more in-store</h3>
+                    <p class="text-sm md:text-base mt-2 opacity-80" style="font-family:'Poppins'">Hands-on fits, friendly stylists, and fresh drops — every visit feels special.</p>
+                </div>
+
+                <!-- Feature cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="border rounded-xl p-6 shadow-sm hover:shadow-md transition">
+                        <h4 class="text-lg font-semibold mb-2" style="font-family:'Poppins'">AR Try-On & Real Fitting</h4>
+                        <p class="text-sm opacity-80" style="font-family:'Poppins'">Preview styles with augmented reality, then feel the perfect fit in person.</p>
+                    </div>
+                    <div class="border rounded-xl p-6 shadow-sm hover:shadow-md transition">
+                        <h4 class="text-lg font-semibold mb-2" style="font-family:'Poppins'">New Drops Weekly</h4>
+                        <p class="text-sm opacity-80" style="font-family:'Poppins'">Stay ahead of trends with fresh arrivals and curated local favorites.</p>
+                    </div>
+                    <div class="border rounded-xl p-6 shadow-sm hover:shadow-md transition">
+                        <h4 class="text-lg font-semibold mb-2" style="font-family:'Poppins'">Friendly Style Guidance</h4>
+                        <p class="text-sm opacity-80" style="font-family:'Poppins'">Our team helps you build looks that match your vibe and budget.</p>
+                    </div>
+                </div>
+
+                <!-- Testimonial -->
+                <div class="mt-10 bg-[#F8F8F8] rounded-xl p-6 md:p-8">
+                    <p class="text-base md:text-lg italic" style="font-family:'Poppins'">“Love the vibe at Halang Branch — tried on outfits with AR, then found my perfect fit with the help of their stylists. Definitely coming back!”</p>
+                    <p class="mt-2 text-sm opacity-70" style="font-family:'Poppins'">— Happy customer</p>
+                </div>
+
+                <!-- CTA Row -->
+                <div class="mt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+                    <div class="text-center md:text-left">
+                        <h5 class="text-base md:text-lg font-semibold" style="font-family:'Poppins'">Planning a visit?</h5>
+                        <p class="text-sm opacity-80" style="font-family:'Poppins'">Tap below for directions to our Halang Branch.</p>
+                    </div>
+                    <a href="https://www.google.com/maps?q=14.1971982,121.1621428" target="_blank" rel="noopener" class="inline-flex items-center justify-center font-semibold bg-[#FAC000] text-black rounded-lg px-6 h-12 transition duration-300 hover:bg-black hover:text-white">
+                        Get Directions
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <footer class="w-full bg-[#000000] text-white mt-6">
+            <div class="w-full px-6 md:px-10 py-10 text-center">
+                <h2 class="text-3xl md:text-4xl font-bold mb-2" style="font-family:'Poppins'">Come visit us</h2>
+                <p class="text-sm md:text-base opacity-80" style="font-family:'Poppins'">Find us on Google Maps</p>
+            </div>
+            <div class="w-full h-[420px] md:h-[500px]">
+                <iframe
+                    title="Store Location Map"
+                    src="https://www.google.com/maps?q=14.1971982,121.1621428&z=17&output=embed"
+                    width="100%"
+                    height="100%"
+                    style="border:0; display:block;"
+                    allowfullscreen
+                    loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+        </footer>
 
 </x-layout>

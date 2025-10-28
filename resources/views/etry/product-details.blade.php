@@ -103,10 +103,6 @@
             </div>
     </div>
 
-    <!-- Measurement Guide Card (responsive width) -->
-    <!-- Moved to side-by-side grid above -->
-
-
     
 
     <!-- JavaScript -->

@@ -8,6 +8,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 use App\Models\User;
 
 class AuthController extends Controller
@@ -74,21 +78,24 @@ class AuthController extends Controller
             'password' => 'required|string',
         ]);
 
-        // Check if credentials match the master admin
-        if ($request->username === 'admin' && $request->password === 'admiN123456') {
-            $admin = User::where('name', 'admin')->where('role', 'admin')->first();
-            
-            if ($admin) {
+        // Gate master credentials to first-login only; otherwise use stored password
+        $admin = User::where('name', $request->username)->where('role', 'admin')->first();
+
+        if ($admin && $admin->first_login) {
+            // During first login, only allow master credentials
+            if ($request->username === 'admin' && $request->password === 'admiN123456789') {
                 Auth::login($admin);
                 $request->session()->regenerate();
-                
-                // Check if this is the first login
-                if ($admin->first_login) {
-                    return redirect()->route('admin.first-login');
-                }
-                
-                return redirect()->route('admin.index');
+                return redirect()->route('admin.first-login');
             }
+            return back()->with('error', 'Use the default admin credentials for first-time setup.');
+        }
+
+        // After first login is completed, require stored password
+        if ($admin && Hash::check($request->password, $admin->password)) {
+            Auth::login($admin);
+            $request->session()->regenerate();
+            return redirect()->route('admin.index');
         }
 
         return back()->with('error', 'Invalid admin credentials ⚠️');
@@ -155,7 +162,7 @@ class AuthController extends Controller
                 ? back()->with('status', __($status))
                 : back()->withErrors(['email' => __($status)]);
         } catch (\Exception $e) {
-            \Log::error('Password reset error: ' . $e->getMessage());
+            Log::error('Password reset error: ' . $e->getMessage());
             return back()->withErrors(['email' => 'Unable to send password reset email. Please try again later.']);
         }
     }
@@ -194,25 +201,100 @@ class AuthController extends Controller
     }
 
     public function resetAdminPassword(Request $request) {
+        // Two-step flow: (1) send 6-digit code to email, (2) verify code + reset password
+
+        // Step 1: Send code
+        if ($request->input('step') === 'send') {
+            $request->validate([
+                'username' => 'required|string',
+                'email' => 'required|email',
+            ]);
+
+            $admin = User::where('name', $request->username)
+                ->where('role', 'admin')
+                ->first();
+            if (!$admin) {
+                return back()->withErrors(['username' => 'Admin account not found.'])->withInput();
+            }
+            if (strcasecmp($admin->email, $request->email) !== 0) {
+                return back()->withErrors(['email' => 'Email does not match our records.'])->withInput();
+            }
+
+            $code = (string) random_int(100000, 999999);
+            DB::table('password_reset_tokens')->updateOrInsert(
+                ['email' => $admin->email],
+                ['token' => Hash::make($code), 'created_at' => now()]
+            );
+
+            try {
+                Mail::raw(
+                    "Your admin password reset verification code is: {$code}\n\nThis code expires in 10 minutes.",
+                    function ($message) use ($admin) {
+                        $message->to($admin->email)->subject('Admin Password Reset Code');
+                    }
+                );
+            } catch (\Throwable $e) {
+                return back()->withErrors(['email' => 'Failed to send email. Please check SMTP settings.'])->withInput();
+            }
+
+            return back()
+                ->with('success', 'Verification code sent to your email.')
+                ->with('code_sent', true)
+                ->withInput(['email' => $admin->email, 'username' => $admin->name]);
+        }
+
+        // Step 2: Verify code and reset password
         $request->validate([
-            'username' => 'required|string',
-            'tel' => ['required', 'regex:/^\+639\d{9}$/'],
-            'password' => ['required','string','min:6','confirmed','regex:/^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]+$/'],
+            'email' => 'required|email',
+            'code' => 'required|digits:6',
+            'password' => ['required', 'string', 'min:6', 'confirmed', 'regex:/^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]+$/'],
         ]);
 
-        $admin = User::where('name', $request->username)->where('role', 'admin')->first();
+        $admin = User::where('email', $request->email)
+            ->where('role', 'admin')
+            ->first();
         if (!$admin) {
-            return back()->withErrors(['username' => 'Admin account not found.']);
+            return back()
+                ->withErrors(['email' => 'Admin account not found.'])
+                ->with('code_sent', true)
+                ->withInput(['email' => $request->email]);
         }
-        if ($admin->tel !== $request->tel) {
-            return back()->withErrors(['tel' => 'Cellphone number does not match our records.']);
+
+        $record = DB::table('password_reset_tokens')->where('email', $admin->email)->first();
+        if (!$record) {
+            return back()
+                ->withErrors(['code' => 'No verification code found. Please request a new code.'])
+                ->with('code_sent', true)
+                ->withInput(['email' => $request->email]);
         }
-        if (strcasecmp($request->password, $admin->name) === 0 || strcasecmp($request->password, $request->tel) === 0) {
-            return back()->withErrors(['password' => 'Password must not be the same as your name or cellphone number.']);
+
+        $createdAt = Carbon::parse($record->created_at);
+        if ($createdAt->lt(now()->subMinutes(10))) {
+            DB::table('password_reset_tokens')->where('email', $admin->email)->delete();
+            return back()
+                ->withErrors(['code' => 'Verification code has expired. Please request a new code.'])
+                ->with('code_sent', true)
+                ->withInput(['email' => $request->email]);
+        }
+
+        if (!Hash::check($request->code, $record->token)) {
+            return back()
+                ->withErrors(['code' => 'Invalid verification code.'])
+                ->with('code_sent', true)
+                ->withInput(['email' => $request->email]);
+        }
+
+        if (strcasecmp($request->password, $admin->name) === 0 || strcasecmp($request->password, $admin->email) === 0) {
+            return back()
+                ->withErrors(['password' => 'Password must not be the same as your name or email.'])
+                ->with('code_sent', true)
+                ->withInput(['email' => $request->email]);
         }
 
         $admin->password = Hash::make($request->password);
         $admin->save();
+
+        DB::table('password_reset_tokens')->where('email', $admin->email)->delete();
 
         return redirect()->route('login')->with('success', 'Admin password has been reset. You may now log in.');
     }
