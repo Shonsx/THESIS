@@ -113,7 +113,7 @@ class AuthController extends Controller
     public function updateAdminProfile(Request $request) {
         $request->validate([
             'password' => ['required', 'string', 'min:6', 'confirmed', 'regex:/^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]+$/'],
-            'tel' => ['required', 'regex:/^\+639\d{9}$/'],
+            'email' => ['required', 'email'],
         ]);
 
         $user = Auth::user();
@@ -121,14 +121,14 @@ class AuthController extends Controller
             return redirect()->route('login');
         }
 
-        // Ensure password not equal to name/tel
-        if (strcasecmp($request->password, $user->name) === 0 || strcasecmp($request->password, $request->tel) === 0) {
-            return back()->withErrors(['password' => 'Password must not be the same as your name or cellphone number.'])->withInput();
+        // Ensure password not equal to name/email
+        if (strcasecmp($request->password, $user->name) === 0 || strcasecmp($request->password, $request->email) === 0) {
+            return back()->withErrors(['password' => 'Password must not be the same as your name or email.'])->withInput();
         }
 
         $user->update([
             'password' => Hash::make($request->password),
-            'tel' => $request->tel,
+            'email' => $request->email,
             'first_login' => false,
         ]);
 

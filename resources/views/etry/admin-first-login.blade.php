@@ -52,7 +52,7 @@
                 
                 <div class="text-center mb-6">
                     <p class="text-black text-lg" style="font-family: 'Poppins'">
-                        Welcome! This is your first login as admin. Please set up your account by changing your password and adding a cellphone number.
+                        Welcome! This is your first login as admin. Please set up your account by changing your password and adding your email.
                     </p>
                 </div>
 
@@ -60,13 +60,11 @@
                     @csrf
                     
                     <div class="relative my-2 w-80 input-box">
-                        <span class="icon"><ion-icon name="call"></ion-icon></span>
-                        <div class="flex items-center space-x-2">
-                            <span class="px-3 py-2 bg-gray-200 rounded-md select-none">+63</span>
-                            <input type="tel" name="tel" id="tel" placeholder="9xxxxxxxxx" required pattern="[0-9]*" inputmode="numeric" style="font-family: 'Poppins'" class="flex-1">
-                        </div>
+                        <span class="icon"><ion-icon name="mail"></ion-icon></span>
+                        <input type="email" name="email" id="email" placeholder=" " required style="font-family: 'Poppins'">
+                        <label for="email">Email</label>
                     </div>
-                    @error('tel')
+                    @error('email')
                         <div class="text-red-500 text-sm mb-2">{{ $message }}</div>
                     @enderror
 
@@ -112,11 +110,11 @@
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 
-    <!-- Password and phone validation script -->
+    <!-- Password and email validation script -->
     <script>
         const password = document.getElementById('password');
         const confirmPassword = document.getElementById('password_confirmation');
-        const telInput = document.getElementById('tel');
+        const emailInput = document.getElementById('email');
         const form = document.querySelector('form[action="{{ route('admin.update-profile') }}"]');
 
         // Password validation regex: at least 1 uppercase, 1 number, no symbols allowed
@@ -139,33 +137,22 @@
             }
         }
 
-        function sanitizePhone(value) {
-            return (value || '').replace(/\D/g, '').slice(0, 10);
-        }
-
-        function validatePhone() {
-            const digits = sanitizePhone(telInput.value);
-            telInput.value = digits;
-            if (!digits || digits.length !== 10 || !digits.startsWith('9')) {
-                telInput.setCustomValidity('Enter 10 digits after +63 starting with 9');
+        function validateEmail() {
+            const value = emailInput.value;
+            if (!value || !value.includes('@')) {
+                emailInput.setCustomValidity('Enter a valid email address');
             } else {
-                telInput.setCustomValidity('');
+                emailInput.setCustomValidity('');
             }
         }
 
         password.addEventListener('input', validatePassword);
         confirmPassword.addEventListener('input', validatePasswordsMatch);
-        if (telInput) telInput.addEventListener('input', validatePhone);
+        if (emailInput) emailInput.addEventListener('input', validateEmail);
 
         if (form) {
             form.addEventListener('submit', function(e) {
-                validatePhone();
-                const digits = sanitizePhone(telInput.value);
-                if (!digits || digits.length !== 10 || !digits.startsWith('9')) {
-                    e.preventDefault();
-                    return;
-                }
-                telInput.value = '+63' + digits;
+                validateEmail();
             });
         }
     </script>

@@ -28,19 +28,21 @@ class OrderProcessed extends Notification
     public function toDatabase($notifiable)
     {
         return [
-            'message' => 'Your order for ' . $this->order->product->name . ' is now being processed.',
+            'message' => 'Your order for ' . $this->order->product->name . ' is now being processed. Can you please add review?',
             'order_id' => $this->order->id,
             'status' => 'Processing',
-            'product_name' => $this->order->product->name
+            'product_name' => $this->order->product->name,
+            'redirect' => route('reviews.create', $this->order->product_id),
         ];
     }
 
     public function toArray(object $notifiable): array
     {
         return [
-            'message' => "Your order for {$this->order->product->name} is now {$this->status}.",
+            'message' => "Your order for {$this->order->product->name} is now {$this->status}. Can you please add review?",
             'order_id' => $this->order->id,
             'status' => $this->status,
+            'redirect' => route('reviews.create', $this->order->product_id),
         ];
     }
 }

@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CartController;
@@ -95,6 +96,11 @@ Route::middleware('guest')->group(function () {
 Route::get('/addProduct', [ProductController::class, 'create'])->name('addProduct');
 Route::post('/addProduct', [ProductController::class, 'store'])->name('addProduct.store');
 Route::get('/products/{id}', [ProductController::class, 'show'])->name('products.show');
+// Reviews
+Route::middleware(['auth'])->group(function () {
+    Route::get('/products/{product}/reviews/create', [ReviewController::class, 'create'])->name('reviews.create');
+    Route::post('/products/{product}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+});
 Route::delete('/products/delete/{id}', [ProductController::class, 'destroy'])->middleware('auth');
 Route::put('/products/{id}', [ProductController::class, 'update'])->name('products.update');
 Route::post('/products/{product}/adjust-stock', [ProductController::class, 'adjustStock'])

@@ -25,7 +25,7 @@
         }
     </style>
 
-    <div class="min-h-screen bg-cover bg-center" style="background-image: url({{ asset('images/BG.png') }})">
+    <div class="min-h-screen bg-cover bg-center bg-no-repeat bg-fixed" style="background-image: url({{ asset('images/BG.png') }})">
         <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 w-full">
             <h1 class="text-3xl font-bold mb-6 pt-8 text-center">Product Details</h1>
             <!-- Product Card -->
@@ -43,6 +43,33 @@
                     <div class="flex flex-col gap-4">
                         <h2 class="text-2xl md:text-3xl font-bold">{{ $product->name }}</h2>
                         <p class="text-gray-700 leading-relaxed">{{ $product->description }}</p>
+                        
+                        <!-- Rating Display -->
+                        <div class="flex items-center space-x-3">
+                            <div class="flex items-center">
+                                @php
+                                    $avg = $averageRating ?? 0;
+                                    $full = floor($avg);
+                                    $half = ($avg - $full) >= 0.5;
+                                @endphp
+                                @for($i = 1; $i <= 5; $i++)
+                                    @if($i <= $full)
+                                        <span class="text-yellow-500 text-xl">★</span>
+                                    @elseif($i === ($full + 1) && $half)
+                                        <span class="relative inline-block text-xl">
+                                            <span class="text-gray-300">★</span>
+                                            <span class="absolute inset-0 w-1/2 overflow-hidden text-yellow-500">★</span>
+                                        </span>
+                                    @else
+                                        <span class="text-gray-300 text-xl">★</span>
+                                    @endif
+                                @endfor
+                            </div>
+                            <div>
+                                <span class="font-semibold">{{ number_format($averageRating ?? 0, 1) }}</span>
+                                <span class="text-gray-600">({{ $reviewsCount ?? 0 }} reviews)</span>
+                            </div>
+                        </div>
     
                         <div class="flex items-center justify-between">
                             <p class="text-2xl font-semibold">₱{{ $product->price }}</p>
@@ -100,6 +127,39 @@
 
             <div id="cart-notification" class="cart-overlay">
                 Item updated successfully!
+            </div>
+
+            <!-- Reviews Section -->
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+                <div class="bg-white rounded-lg shadow-lg p-6 mb-12">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold">Customer Reviews</h3>
+                        <a href="{{ route('reviews.create', $product->id) }}" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">Add a Review</a>
+                    </div>
+                    @if(isset($reviews) && $reviews->count() > 0)
+                        <div class="space-y-4">
+                            @foreach($reviews as $review)
+                                <div class="border border-gray-200 rounded-lg p-4">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center space-x-2">
+                                            <span class="text-yellow-500">★</span>
+                                            <span class="font-semibold">{{ number_format($review->rating, 1) }}</span>
+                                        </div>
+                                        <span class="text-gray-500 text-sm">by {{ $review->user->name ?? 'Anonymous' }} • {{ $review->created_at->diffForHumans() }}</span>
+                                    </div>
+                                    @if($review->comment)
+                                        <p class="mt-2 text-gray-700">{{ $review->comment }}</p>
+                                    @endif
+                                </div>
+                            @endforeach
+                        </div>
+                        <div class="mt-4">
+                            {{ $reviews->links('pagination::tailwind') }}
+                        </div>
+                    @else
+                        <p class="text-gray-600">No reviews yet. Be the first to review this product!</p>
+                    @endif
+                </div>
             </div>
     </div>
 

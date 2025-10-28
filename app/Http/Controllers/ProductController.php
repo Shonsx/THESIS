@@ -310,7 +310,12 @@ class ProductController extends Controller
         $cartItemIds = $user 
             ? Cart::where('user_id', $user->id)->pluck('product_id')->toArray() 
             : [];
-        return view('etry.product-details', compact('product', 'stocks', 'cartItemIds'));
+        // Reviews & Ratings
+        $averageRating = round((float) ($product->reviews()->avg('rating') ?? 0), 1);
+        $reviews = $product->reviews()->with('user')->latest()->paginate(5);
+        $reviewsCount = $product->reviews()->count();
+
+        return view('etry.product-details', compact('product', 'stocks', 'cartItemIds', 'averageRating', 'reviews', 'reviewsCount'));
     }
 
 
