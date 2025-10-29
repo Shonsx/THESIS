@@ -258,25 +258,21 @@ use App\Models\Order;
             'name' => 'required|string',
             'price' => 'required|numeric',
             'description' => 'nullable|string',
-            'image' => 'required|image',
+            'image' => 'image|nullable',
             'measurement_image' => 'image|nullable',
-            'sizes' => 'array',
+            'sizes' => 'array|nullable',
             'gender' => 'required|in:Men,Women',
         ]);
 
-        // Handle product image (store under public storage)
-        $imageFile = $request->file('image');
-        if (!$imageFile || !$imageFile->isValid()) {
-            Log::error('Product create: invalid image upload', [
-                'has_file' => (bool) $imageFile,
-                'error' => $imageFile ? $imageFile->getError() : 'no file'
-            ]);
-            return back()->with('error', 'Image upload failed. Please try again.')->withInput();
-        }
-        $imagePath = $imageFile->store('products', 'public');
-        if (!$imagePath || !is_string($imagePath)) {
-            Log::error('Product create: storing image failed');
-            return back()->with('error', 'Saving image failed. Please try again.')->withInput();
+        // Handle product image (store under public storage if provided)
+        $imagePath = null;
+        if ($request->hasFile('image')) {
+            $imageFile = $request->file('image');
+            if ($imageFile->isValid()) {
+                $imagePath = $imageFile->store('products', 'public');
+            } else {
+                Log::warning('Product create: invalid image upload');
+            }
         }
 
         $measurementImagePath = null;
@@ -296,18 +292,21 @@ use App\Models\Order;
         }
 
         // Save product
+        $sizes = $request->input('sizes', []);
+        if (!is_array($sizes)) { $sizes = []; }
+
         $product = Product::create([
             'name' => $request->name,
             'price' => $request->price,
             'description' => $request->description,
-            'image' => $imagePath,
+            'image' => $imagePath ?? '',
             'measurement_image' => $measurementImagePath, // ← Save measurement image
-            'sizes' => json_encode($request->sizes),
+            'sizes' => json_encode($sizes),
             'gender' => $request->gender,
         ]);
 
         // Save size/stock in ProductStock table
-        foreach ($request->sizes as $size) {
+        foreach ($sizes as $size) {
             $stock = $request->stock[$size] ?? 0;
 
             ProductStock::create([
