@@ -105,11 +105,11 @@
                 <div class="flex justify-center items-center gap-6 mt-8">
                     <a href="https://www.facebook.com/cspotblvd" target="_blank" rel="noopener noreferrer" class="flex items-center gap-3 px-6 py-3 bg-[#1877F2] text-white rounded-lg hover:bg-[#166FE5] transition-colors duration-300 shadow-md hover:shadow-lg">
                         <img src="{{ asset('icons/facebook.svg') }}" alt="Facebook" class="w-6 h-6 text-white">
-                        <span class="font-semibold" style="font-family:'Poppins'">Follow us on Facebook</span>
+                        <span class="font-semibold" style="font-family:'Poppins'; color: 'black';">Follow us on Facebook</span>
                     </a>
                     <a href="https://www.instagram.com/cspotblvd/" target="_blank" rel="noopener noreferrer" class="flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-[#E4405F] via-[#F56040] to-[#FFDC80] text-white rounded-lg hover:from-[#D73653] hover:via-[#E55A3C] hover:to-[#F0D078] transition-all duration-300 shadow-md hover:shadow-lg">
                         <img src="{{ asset('icons/instagram.svg') }}" alt="Instagram" class="w-6 h-6 text-white">
-                        <span class="font-semibold" style="font-family:'Poppins'">Follow us on Instagram</span>
+                        <span class="font-semibold" style="font-family:'Poppins'; color: 'black';">Follow us on Instagram</span>
                     </a>
                 </div>
             </div>
