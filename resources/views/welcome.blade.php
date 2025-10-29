@@ -17,6 +17,26 @@
 .group-hover\:paused:hover {
     animation-play-state: paused;
 }
+/* Social buttons */
+.social-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0.75rem 1.25rem;
+    border-radius: 0.5rem;
+    color: #fff;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.10);
+    transition: transform 180ms ease, box-shadow 180ms ease, filter 180ms ease;
+    will-change: transform, box-shadow;
+}
+.social-btn:hover {
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 10px 26px rgba(0,0,0,0.16);
+    filter: saturate(110%);
+}
+.social-btn--fb { background-color: #1877F2; }
+.social-btn--ig { background-image: linear-gradient(90deg, #E4405F, #F56040, #FFDC80); }
+.social-icon { width: 24px; height: 24px; }
 </style>
 
 
@@ -103,13 +123,13 @@
                 
                 <!-- Social Media Links -->
                 <div class="flex justify-center items-center gap-6 mt-8">
-                    <a href="https://www.facebook.com/cspotblvd" target="_blank" rel="noopener noreferrer" class="flex items-center gap-3 px-6 py-3 bg-[#1877F2] text-white rounded-lg hover:bg-[#166FE5] transition-colors duration-300 shadow-md hover:shadow-lg">
-                        <img src="{{ asset('icons/facebook.svg') }}" alt="Facebook" class="w-6 h-6 text-white">
-                        <span class="font-semibold" style="font-family:'Poppins'; color: 'black';">Follow us on Facebook</span>
+                    <a href="https://www.facebook.com/cspotblvd" target="_blank" rel="noopener noreferrer" class="social-btn social-btn--fb" aria-label="Visit our Facebook page">
+                        <img src="{{ asset('icons/facebook.svg') }}" alt="Facebook" class="social-icon">
+                        <span class="font-semibold" style="font-family:'Poppins'">Follow us on Facebook</span>
                     </a>
-                    <a href="https://www.instagram.com/cspotblvd/" target="_blank" rel="noopener noreferrer" class="flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-[#E4405F] via-[#F56040] to-[#FFDC80] text-white rounded-lg hover:from-[#D73653] hover:via-[#E55A3C] hover:to-[#F0D078] transition-all duration-300 shadow-md hover:shadow-lg">
-                        <img src="{{ asset('icons/instagram.svg') }}" alt="Instagram" class="w-6 h-6 text-white">
-                        <span class="font-semibold" style="font-family:'Poppins'; color: 'black';">Follow us on Instagram</span>
+                    <a href="https://www.instagram.com/cspotblvd/" target="_blank" rel="noopener noreferrer" class="social-btn social-btn--ig" aria-label="Visit our Instagram page">
+                        <img src="{{ asset('icons/instagram.svg') }}" alt="Instagram" class="social-icon">
+                        <span class="font-semibold" style="font-family:'Poppins'">Follow us on Instagram</span>
                     </a>
                 </div>
             </div>
