@@ -26,17 +26,26 @@
     border-radius: 0.5rem;
     color: #fff;
     box-shadow: 0 6px 18px rgba(0,0,0,0.10);
-    transition: transform 180ms ease, box-shadow 180ms ease, filter 180ms ease;
+    transition: box-shadow 180ms ease, filter 180ms ease;
     will-change: transform, box-shadow;
 }
-.social-btn:hover {
-    transform: translateY(-2px) scale(1.04);
-    box-shadow: 0 10px 26px rgba(0,0,0,0.16);
-    filter: saturate(110%);
-}
+.social-btn:focus-visible { outline: 2px solid rgba(255,255,255,0.9); outline-offset: 2px; }
 .social-btn--fb { background-color: #1877F2; }
 .social-btn--ig { background-image: linear-gradient(90deg, #E4405F, #F56040, #FFDC80); }
 .social-icon { width: 24px; height: 24px; }
+
+/* Bigger pop/bounce on hover */
+@keyframes pop-bounce {
+    0%   { transform: translateY(0) scale(1); }
+    35%  { transform: translateY(-4px) scale(1.12); }
+    60%  { transform: translateY(0) scale(0.98); }
+    100% { transform: translateY(-2px) scale(1.06); }
+}
+.social-btn:hover {
+    animation: pop-bounce 240ms ease-out;
+    box-shadow: 0 10px 26px rgba(0,0,0,0.16);
+    filter: saturate(110%);
+}
 </style>
 
 
