@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\Cart;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use App\Models\User;
 use App\Models\ProductStock;
 use App\Models\SiteVisit;
@@ -257,14 +258,26 @@ use App\Models\Order;
             'name' => 'required|string',
             'price' => 'required|numeric',
             'description' => 'nullable|string',
-            'image' => 'image|nullable',
+            'image' => 'required|image',
             'measurement_image' => 'image|nullable',
             'sizes' => 'array',
             'gender' => 'required|in:Men,Women',
         ]);
 
-        // Handle product image (store under public/images)
-        $imagePath = $request->file('image')?->store('products', 'public');
+        // Handle product image (store under public storage)
+        $imageFile = $request->file('image');
+        if (!$imageFile || !$imageFile->isValid()) {
+            Log::error('Product create: invalid image upload', [
+                'has_file' => (bool) $imageFile,
+                'error' => $imageFile ? $imageFile->getError() : 'no file'
+            ]);
+            return back()->with('error', 'Image upload failed. Please try again.')->withInput();
+        }
+        $imagePath = $imageFile->store('products', 'public');
+        if (!$imagePath || !is_string($imagePath)) {
+            Log::error('Product create: storing image failed');
+            return back()->with('error', 'Saving image failed. Please try again.')->withInput();
+        }
 
         $measurementImagePath = null;
         if ($request->hasFile('measurement_image')) {

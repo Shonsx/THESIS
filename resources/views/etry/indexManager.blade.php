@@ -244,8 +244,8 @@
             document.getElementById('product-name').value = name;
             document.getElementById('product-description').value = desc;
             document.getElementById('product-price').value = price;
-            document.getElementById('product-image-preview').src = '/storage/' + image;
-            document.getElementById('product-measurement-preview').src = measurement ? ('/storage/' + measurement) : '';
+            document.getElementById('product-image-preview').src = '/files/' + image;
+            document.getElementById('product-measurement-preview').src = measurement ? ('/files/' + measurement) : '';
 
             // Reset sizes: all unchecked, stock = 0, hidden
             Object.keys(@json($sizeNames)).forEach(size => {
