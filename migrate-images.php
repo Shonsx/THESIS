@@ -114,12 +114,12 @@ foreach ($products as $product) {
 }
 
 // Update GCash images
-$gcashes = GCash::whereNotNull('image')->get();
+$gcashes = GCash::whereNotNull('image_path')->get();
 foreach ($gcashes as $gcash) {
-    $oldPath = $gcash->image;
+    $oldPath = $gcash->image_path;
     if (str_starts_with($oldPath, 'images/gcash/')) {
         $newPath = str_replace('images/gcash/', 'gcash/', $oldPath);
-        $gcash->update(['image' => $newPath]);
+        $gcash->update(['image_path' => $newPath]);
         echo " ✓ Updated GCash: {$oldPath} → {$newPath}\n";
         $updated++;
     }
