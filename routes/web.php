@@ -275,13 +275,6 @@ Route::get('/orders/{order}/rejection', [CashierController::class, 'rejectionVie
 Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.readAll');
 
 
-
-Route::get('/logout', function () {
-    Auth::logout();
-    return redirect('welcome');
-})->name('logout');
-
-
 Route::middleware(['web'])->group(function () {
     Route::post('/analytics/heartbeat', [\App\Http\Controllers\ProductController::class, 'heartbeat'])->name('analytics.heartbeat');
     Route::get('/analytics/online-count', [\App\Http\Controllers\ProductController::class, 'onlineCount'])->name('analytics.onlineCount');
