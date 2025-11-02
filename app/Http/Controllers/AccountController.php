@@ -24,18 +24,29 @@ class AccountController extends Controller
     // Handle account update request
     public function updateAccount(Request $request)
     {
+        /** @var \App\Models\User $user */
         $user = Auth::user();
 
-        $validatedData = $request->validate([
+        // Adjust validation and updates based on role
+        $rules = [
             'email' => 'required|email',
-            'name' => 'nullable|string',
-            'tel' => 'required|string',
             'password' => 'nullable|string|min:7|confirmed',
-        ]);
-        // Allow all users (including admin) to update their name
-        $user->name = $validatedData['name'];
+        ];
+        if ($user->role !== 'admin') {
+            $rules['name'] = 'nullable|string';
+            $rules['tel'] = 'required|string';
+        }
+
+        $validatedData = $request->validate($rules);
+
+        // Email can always be updated
         $user->email = $validatedData['email'];
-        $user->tel = $validatedData['tel'];
+
+        // Non-admins may update name and mobile
+        if ($user->role !== 'admin') {
+            $user->name = $validatedData['name'] ?? $user->name;
+            $user->tel = $validatedData['tel'] ?? $user->tel;
+        }
 
         // Update password only if provided
         if (!empty($validatedData['password'])) {

@@ -24,28 +24,72 @@
     gap: 12px;
     padding: 0.75rem 1.25rem;
     border-radius: 0.5rem;
-    color: #fff;
+    color: #111;
     box-shadow: 0 6px 18px rgba(0,0,0,0.10);
-    transition: box-shadow 180ms ease, filter 180ms ease;
-    will-change: transform, box-shadow;
+    transition: box-shadow 200ms ease, filter 200ms ease, color 200ms ease;
+    position: relative;
+    overflow: hidden;
 }
 .social-btn:focus-visible { outline: 2px solid rgba(255,255,255,0.9); outline-offset: 2px; }
-.social-btn--fb { background-color: #1877F2; }
-.social-btn--ig { background-image: linear-gradient(90deg, #E4405F, #F56040, #FFDC80); }
+.social-btn--fb { background-color: #ffffff; }
+.social-btn--ig { background-color: #ffffff; }
 .social-icon { width: 24px; height: 24px; }
 
-/* Bigger pop/bounce on hover */
-@keyframes pop-bounce {
-    0%   { transform: translateY(0) scale(1); }
-    35%  { transform: translateY(-4px) scale(1.12); }
-    60%  { transform: translateY(0) scale(0.98); }
-    100% { transform: translateY(-2px) scale(1.06); }
+/* Ensure content sits above the liquid */
+.social-btn > * { position: relative; z-index: 2; }
+
+/* Liquid fill base (bottom-center rise) */
+.social-btn::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: -18%;
+    width: 130%;
+    height: 0%;
+    border-top-left-radius: 60% 25%;
+    border-top-right-radius: 60% 25%;
+    transition: height 480ms ease;
+    z-index: 1;
 }
+
+/* Platform-specific liquid color */
+.social-btn--fb::before { 
+    background-image: linear-gradient(180deg, #86c8ff 0%, #3a96f7 50%, #1877F2 100%);
+}
+.social-btn--ig::before {
+    background-image: linear-gradient(180deg, #FFDC80 0%, #FCAF45 25%, #F56040 50%, #E4405F 75%, #B83290 100%);
+}
+
+/* Hover: liquid rises to fill */
+.social-btn:hover::before { height: 145%; }
+
+/* Subtle wave highlight for liquid */
+.social-btn::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: -10%;
+    width: 110%;
+    height: 0%;
+    border-top-left-radius: 60% 25%;
+    border-top-right-radius: 60% 25%;
+    background: rgba(255,255,255,0.18);
+    transition: height 520ms ease;
+    z-index: 1;
+}
+.social-btn:hover::after { height: 120%; }
+
+/* Gentle emphasis on hover without pop */
 .social-btn:hover {
-    animation: pop-bounce 240ms ease-out;
     box-shadow: 0 10px 26px rgba(0,0,0,0.16);
     filter: saturate(110%);
+    color: #ffffff;
 }
+
+/* Make black icons turn white on hover for contrast over fill */
+.social-btn:hover .social-icon { filter: brightness(0) invert(1); }
 </style>
 
 

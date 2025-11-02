@@ -99,9 +99,6 @@
                         <span class="icon"><ion-icon name="mail"></ion-icon></span>
                         <input type="email" name="email" id="email" placeholder=" " style="font-family: 'Poppins'">
                         <label for="email">Email</label>
-                        @error('email')
-                            <p class="absolute text-xs text-white -bottom-5 left-2">{{ $message }}</p>
-                        @enderror
                     </div>
 
                     <!-- Password -->
@@ -109,9 +106,6 @@
                         <span class="icon"><ion-icon name="lock-closed"></ion-icon></span>
                         <input type="password" name="password" id="password" placeholder=" " style="font-family: 'Poppins'">
                         <label for="password">Password</label>
-                        @error('password')
-                            <p class="absolute text-xs text-white -bottom-5 left-2">{{ $message }}</p>
-                        @enderror
                     </div>
                     <p id="password-rule-msg" class="text-md text-white"></p>
 
@@ -128,9 +122,6 @@
                         <span class="icon"><ion-icon name="person"></ion-icon></span>
                         <input type="text" name="name" id="name" placeholder=" " style="font-family: 'Poppins'">
                         <label for="name">Full Name</label>
-                        @error('name')
-                            <p class="absolute text-xs text-white -bottom-5 left-2">{{ $message }}</p>
-                        @enderror
                     </div>
 
                     <!-- Phone -->
@@ -150,6 +141,24 @@
             </div>
         </div>
     </div>
+
+    <!-- Transient Error Modal for Register -->
+    @if(session('error') || $errors->any())
+    <div id="signupErrorModal" class="fixed inset-0 hidden items-center justify-center z-[60]">
+        <div class="absolute inset-0 bg-black/40" onclick="hideModal('signupErrorModal')"></div>
+        <div class="relative bg-red-600 text-white rounded-xl shadow-lg px-5 py-4 text-center">
+            <p class="text-white font-medium" style="font-family: 'Poppins'">
+                @if(session('error'))
+                    {{ session('error') }}
+                @elseif($errors->has('email'))
+                    {{ $errors->first('email') }}
+                @else
+                    {{ $errors->first() }}
+                @endif
+            </p>
+        </div>
+    </div>
+    @endif
 
     <!-- Icons -->
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
@@ -236,5 +245,25 @@
                 telInput.value = '+63' + digits;
             });
         }
+
+        // Transient modal helpers (match login behavior)
+        function showTransientModal(id, ms = 3000) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.classList.remove('hidden');
+            el.classList.add('flex');
+            setTimeout(() => hideModal(id), ms);
+        }
+        function hideModal(id) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.classList.add('hidden');
+            el.classList.remove('flex');
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            if (document.getElementById('signupErrorModal')) {
+                showTransientModal('signupErrorModal');
+            }
+        });
     </script>
 </x-layout>
