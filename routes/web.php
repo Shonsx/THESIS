@@ -207,6 +207,21 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/checkout', [CartController::class, 'checkout'])->name('checkout.index');
 });
 
+// Lightweight real-time counters for badges
+Route::middleware(['auth'])->group(function () {
+    Route::get('/notifications/count', function () {
+        $user = \Illuminate\Support\Facades\Auth::user();
+        $unread = $user ? ($user->unreadNotifications ? $user->unreadNotifications->count() : 0) : 0;
+        return response()->json(['unread' => $unread]);
+    })->name('notifications.count');
+
+    Route::get('/cart/count', function () {
+        $userId = \Illuminate\Support\Facades\Auth::id();
+        $count = $userId ? \App\Models\Cart::where('user_id', $userId)->count() : 0;
+        return response()->json(['count' => $count]);
+    })->name('cart.count');
+});
+
 //CASHIER CONTROL
 Route::middleware(['auth'])->group(function() {
     Route::get('/cashier', function () {

@@ -14,7 +14,6 @@
         <nav class="bg-[#000000] py-2 px-4 relative z-40">
             <div class="flex justify-between items-center">
                 <div class="flex items-center space-x-2 cursor-pointer" onclick="window.location.href='/'">
-                    <img src="{{asset('icons/Shopping-bag.svg')}}" class="w-8 h-8">
                     <img src="{{asset('images/E-LOGO-removebg-preview.png')}}" alt="E-Try" class="w-auto h-15 scale-125">
                 </div>
         
@@ -68,10 +67,9 @@
                             <button class="focus:outline-none" onclick="toggleNotifications()" aria-expanded="false">
                                 <img src="{{ asset('icons/bell-notification.svg') }}" alt="Notification Bell" class="w-7 h-7 cursor-pointer">
                             </button>
-                            <!-- Notification Count Badge -->
-                            @if(auth()->check() && optional(auth()->user())->unreadNotifications->count() > 0)
-                                <span class="absolute top-0 right-0 rounded-full bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center">!</span>
-                            @endif
+                            <!-- Notification Count Badge (real-time) -->
+                            @php $initialUnread = auth()->check() ? optional(auth()->user())->unreadNotifications->count() : 0; @endphp
+                            <span id="notificationBadge" class="absolute top-0 right-0 rounded-full bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center {{ ($initialUnread ?? 0) > 0 ? '' : 'hidden' }}">!</span>
                         
                             <!-- Notification Dropdown -->
                             <div id="notificationDropdown" class="absolute right-0 mt-2 w-72 bg-white border border-gray-300 rounded-lg shadow-lg hidden z-50" aria-hidden="true">
@@ -127,6 +125,21 @@
                                 @endif
                             </div>                            
                         </div>
+
+                        @if(auth()->user()->role === 'customer')
+                        <!-- Shopping Cart Icon (directs to cart page) -->
+                        <div class="relative">
+                            <a href="{{ route('cart.show') }}" class="focus:outline-none" aria-label="Go to Cart">
+                                <img src="{{ asset('icons/Shopping-bag.svg') }}" alt="Shopping Cart" class="w-9 h-9 cursor-pointer">
+                            </a>
+                            <!-- Cart Count Badge (real-time) -->
+                            @php
+                                $cartCount = \App\Models\Cart::where('user_id', auth()->id())->count();
+                            @endphp
+                            <span id="cartBadge" class="absolute top-0 right-0 rounded-full bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center {{ $cartCount > 0 ? '' : 'hidden' }}">{{ $cartCount }}</span>
+                        </div>
+                        @endif
+
                         <h2 class="text-white">{{Auth::user()->name}}</h2>
                         <div class="relative">
                             <button id="dropdownBtnDesktop" class="focus:outline-none">
@@ -135,9 +148,6 @@
                             <div id="dropdownMenuDesktop" class="absolute right-0 mt-2 w-40 bg-white border border-gray-300 rounded-lg shadow-lg hidden z-50">
                                 <a href="{{ route('account') }}" class="block px-4 py-2 hover:bg-gray-100">Account</a>
                                 <a href="{{ auth()->user()->role == 'admin' ? route('settings.admin') : route('settings.account') }}" class="block px-4 py-2 hover:bg-gray-100">Settings</a>
-                                @if(auth()->user()->role === 'customer')
-                                <a href="{{ route('cart.show') }}" class="block px-4 py-2 hover:bg-gray-100">Cart</a>
-                                @endif
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
                                     <button type="submit" class="block w-full text-left px-4 py-2 hover:bg-gray-100">Logout</button>
@@ -197,9 +207,6 @@
                     <div id="dropdownMenuMobile" class="hidden bg-white border border-gray-300 rounded-lg shadow-lg w-full">
                         <a href="{{ route('account') }}" class="block px-4 py-2 hover:bg-gray-100">Account</a>
                         <a href="{{ auth()->user()->role == 'admin' ? route('settings.admin') : route('settings.account') }}" class="block px-4 py-2 hover:bg-gray-100">Settings</a>
-                        @if(auth()->user()->role === 'customer')
-                        <a href="{{ route('cart.show') }}" class="block px-4 py-2 hover:bg-gray-100">Cart</a>
-                        @endif
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <button type="submit" class="block w-full text-left px-4 py-2 hover:bg-gray-100">Logout</button>
@@ -234,22 +241,96 @@
             dropdown.setAttribute('aria-hidden', isExpanded);
         }
 
-        // Close notification dropdown when clicking outside
+        // --------DROPDOWN FOR SHOPPING CART--------
+        function toggleCart() {
+            const dropdown = document.getElementById('cartDropdown');
+            const button = document.querySelector('button[onclick="toggleCart()"]');
+            dropdown.classList.toggle('hidden');
+            const isExpanded = dropdown.classList.contains('hidden');
+            button.setAttribute('aria-expanded', !isExpanded);
+            dropdown.setAttribute('aria-hidden', isExpanded);
+        }
+
+        // Close notification and cart dropdowns when clicking outside
         document.addEventListener('click', function(event) {
-            const dropdown = document.getElementById('notificationDropdown');
-            const bell = document.querySelector('button[onclick="toggleNotifications()"]');
-            if (!dropdown || !bell) return;
-            if (!dropdown.contains(event.target) && !bell.contains(event.target)) {
-                dropdown.classList.add('hidden');
+            const notificationDropdown = document.getElementById('notificationDropdown');
+            const notificationBell = document.querySelector('button[onclick="toggleNotifications()"]');
+            const cartDropdown = document.getElementById('cartDropdown');
+            const cartButton = document.querySelector('button[onclick="toggleCart()"]');
+            
+            // Close notification dropdown
+            if (notificationDropdown && notificationBell) {
+                if (!notificationDropdown.contains(event.target) && !notificationBell.contains(event.target)) {
+                    notificationDropdown.classList.add('hidden');
+                }
+            }
+            
+            // Close cart dropdown (if present)
+            if (cartDropdown && cartButton) {
+                if (!cartDropdown.contains(event.target) && !cartButton.contains(event.target)) {
+                    cartDropdown.classList.add('hidden');
+                }
             }
         });
 
-        // Close dropdown when clicking on notification link
+        // Close dropdowns when clicking on links
         document.querySelectorAll('.notification-link').forEach(link => {
             link.addEventListener('click', function() {
                 const dropdown = document.getElementById('notificationDropdown');
                 if (dropdown) dropdown.classList.add('hidden');
             });
+        });
+
+        // --- Real-time badge updates for notifications and cart ---
+        async function fetchJSON(url) {
+            try {
+                const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+                if (!res.ok) return null;
+                return await res.json();
+            } catch (e) {
+                return null;
+            }
+        }
+
+        async function updateRealtimeBadges() {
+            const notificationBadge = document.getElementById('notificationBadge');
+            const cartBadge = document.getElementById('cartBadge');
+
+            const notifUrl = '{{ auth()->check() ? route('notifications.count') : '' }}';
+            const cartUrl = '{{ auth()->check() ? route('cart.count') : '' }}';
+
+            const [notifData, cartData] = await Promise.all([
+                notifUrl ? fetchJSON(notifUrl) : Promise.resolve(null),
+                cartUrl ? fetchJSON(cartUrl) : Promise.resolve(null)
+            ]);
+
+            if (notifData && notificationBadge) {
+                const unread = Number(notifData.unread || 0);
+                if (unread > 0) {
+                    // Keep design using '!'
+                    notificationBadge.textContent = '!';
+                    notificationBadge.classList.remove('hidden');
+                } else {
+                    notificationBadge.classList.add('hidden');
+                }
+            }
+
+            if (cartData && cartBadge) {
+                const count = Number(cartData.count || 0);
+                if (count > 0) {
+                    cartBadge.textContent = String(count);
+                    cartBadge.classList.remove('hidden');
+                } else {
+                    cartBadge.classList.add('hidden');
+                }
+            }
+        }
+
+        // Refresh every 5 seconds and on tab focus
+        updateRealtimeBadges();
+        setInterval(updateRealtimeBadges, 5000);
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) updateRealtimeBadges();
         });
     </script>
 </body>
