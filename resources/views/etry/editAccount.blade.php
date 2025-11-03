@@ -13,7 +13,7 @@
                     <hr class="my-2">
                 </div>
 
-                @if (!$user->is_admin)
+                @if ($user->role !== 'admin')
                 <div class="mb-4">
                     <p class="text-sm text-gray-600">Name</p>
                     <input type="text" name="name" value="{{ old('name', $user->name) }}" 
@@ -22,12 +22,14 @@
                 </div>
                 @endif
 
+                @if ($user->role !== 'admin')
                 <div class="mb-4">
                     <p class="text-sm text-gray-600">Mobile Number</p>
                     <input type="tel" name="tel" value="{{ old('tel', $user->tel) }}" 
                            class="w-full border rounded-xl p-2" required>
                     <hr class="my-2">
                 </div>
+                @endif
 
                 <div class="mb-4">
                     <p class="text-sm text-gray-600">New Password (Optional)</p>

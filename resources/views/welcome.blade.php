@@ -17,6 +17,79 @@
 .group-hover\:paused:hover {
     animation-play-state: paused;
 }
+/* Social buttons */
+.social-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0.75rem 1.25rem;
+    border-radius: 0.5rem;
+    color: #111;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.10);
+    transition: box-shadow 200ms ease, filter 200ms ease, color 200ms ease;
+    position: relative;
+    overflow: hidden;
+}
+.social-btn:focus-visible { outline: 2px solid rgba(255,255,255,0.9); outline-offset: 2px; }
+.social-btn--fb { background-color: #ffffff; }
+.social-btn--ig { background-color: #ffffff; }
+.social-icon { width: 24px; height: 24px; }
+
+/* Ensure content sits above the liquid */
+.social-btn > * { position: relative; z-index: 2; }
+
+/* Liquid fill base (bottom-center rise) */
+.social-btn::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: -18%;
+    width: 130%;
+    height: 0%;
+    border-top-left-radius: 60% 25%;
+    border-top-right-radius: 60% 25%;
+    transition: height 480ms ease;
+    z-index: 1;
+}
+
+/* Platform-specific liquid color */
+.social-btn--fb::before { 
+    background-image: linear-gradient(180deg, #86c8ff 0%, #3a96f7 50%, #1877F2 100%);
+}
+.social-btn--ig::before {
+    background-image: linear-gradient(180deg, #FFDC80 0%, #FCAF45 25%, #F56040 50%, #E4405F 75%, #B83290 100%);
+}
+
+/* Hover: liquid rises to fill */
+.social-btn:hover::before { height: 145%; }
+
+/* Subtle wave highlight for liquid */
+.social-btn::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: -10%;
+    width: 110%;
+    height: 0%;
+    border-top-left-radius: 60% 25%;
+    border-top-right-radius: 60% 25%;
+    background: rgba(255,255,255,0.18);
+    transition: height 520ms ease;
+    z-index: 1;
+}
+.social-btn:hover::after { height: 120%; }
+
+/* Gentle emphasis on hover without pop */
+.social-btn:hover {
+    box-shadow: 0 10px 26px rgba(0,0,0,0.16);
+    filter: saturate(110%);
+    color: #ffffff;
+}
+
+/* Make black icons turn white on hover for contrast over fill */
+.social-btn:hover .social-icon { filter: brightness(0) invert(1); }
 </style>
 
 
@@ -99,6 +172,18 @@
                     <img src="{{ asset('images/Store2_BG.jpg') }}" alt="Store photo 2" class="w-full h-[240px] md:h-[300px] object-cover rounded-lg shadow hover:scale-[1.02] transition-transform duration-300" />
                     <img src="{{ asset('images/Store3_BG.jpg') }}" alt="Store photo 3" class="w-full h-[240px] md:h-[300px] object-cover rounded-lg shadow hover:scale-[1.02] transition-transform duration-300" />
                     <img src="{{ asset('images/Store4_BG.jpg') }}" alt="Store photo 4" class="w-full h-[240px] md:h-[300px] object-cover rounded-lg shadow hover:scale-[1.02] transition-transform duration-300" />
+                </div>
+                
+                <!-- Social Media Links -->
+                <div class="flex justify-center items-center gap-6 mt-8">
+                    <a href="https://www.facebook.com/cspotblvd" target="_blank" rel="noopener noreferrer" class="social-btn social-btn--fb" aria-label="Visit our Facebook page">
+                        <img src="{{ asset('icons/facebook.svg') }}" alt="Facebook" class="social-icon">
+                        <span class="font-semibold" style="font-family:'Poppins'">Follow us on Facebook</span>
+                    </a>
+                    <a href="https://www.instagram.com/cspotblvd/" target="_blank" rel="noopener noreferrer" class="social-btn social-btn--ig" aria-label="Visit our Instagram page">
+                        <img src="{{ asset('icons/instagram.svg') }}" alt="Instagram" class="social-icon">
+                        <span class="font-semibold" style="font-family:'Poppins'">Follow us on Instagram</span>
+                    </a>
                 </div>
             </div>
         </section>

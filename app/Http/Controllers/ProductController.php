@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\Cart;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use App\Models\User;
 use App\Models\ProductStock;
 use App\Models\SiteVisit;
@@ -259,12 +260,20 @@ use App\Models\Order;
             'description' => 'nullable|string',
             'image' => 'image|nullable',
             'measurement_image' => 'image|nullable',
-            'sizes' => 'array',
+            'sizes' => 'array|nullable',
             'gender' => 'required|in:Men,Women',
         ]);
 
-        // Handle product image (store under public/images)
-        $imagePath = $request->file('image')?->store('products', 'public');
+        // Handle product image (store under public storage if provided)
+        $imagePath = null;
+        if ($request->hasFile('image')) {
+            $imageFile = $request->file('image');
+            if ($imageFile->isValid()) {
+                $imagePath = $imageFile->store('products', 'public');
+            } else {
+                Log::warning('Product create: invalid image upload');
+            }
+        }
 
         $measurementImagePath = null;
         if ($request->hasFile('measurement_image')) {
@@ -283,18 +292,21 @@ use App\Models\Order;
         }
 
         // Save product
+        $sizes = $request->input('sizes', []);
+        if (!is_array($sizes)) { $sizes = []; }
+
         $product = Product::create([
             'name' => $request->name,
             'price' => $request->price,
             'description' => $request->description,
-            'image' => $imagePath,
+            'image' => $imagePath ?? '',
             'measurement_image' => $measurementImagePath, // ← Save measurement image
-            'sizes' => json_encode($request->sizes),
+            'sizes' => json_encode($sizes),
             'gender' => $request->gender,
         ]);
 
         // Save size/stock in ProductStock table
-        foreach ($request->sizes as $size) {
+        foreach ($sizes as $size) {
             $stock = $request->stock[$size] ?? 0;
 
             ProductStock::create([

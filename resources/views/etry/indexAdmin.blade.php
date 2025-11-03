@@ -133,7 +133,8 @@
             </select>
         </form>
 
-        <table class="w-full border-collapse border border-gray-300 shadow-md">
+        <div class="overflow-x-auto">
+        <table class="min-w-[800px] w-full border-collapse border border-gray-300 shadow-md text-xs md:text-sm">
             <thead>
                 <tr class="bg-gray-100">
                     <th class="border border-gray-300 px-4 py-2">Image</th>
@@ -170,7 +171,7 @@
                     @endphp
                     <tr>
                         <td class="border border-gray-300 px-4 py-2 text-center">
-                            <img src="{{ route('files.public', ['path' => $product->image]) }}" alt="{{ $product->name }}" class="w-20 h-20 object-contain mx-auto">
+                            <img src="{{ route('files.public', ['path' => $product->image]) }}" alt="{{ $product->name }}" class="w-16 h-16 md:w-20 md:h-20 object-contain mx-auto">
                         </td>
                         <td class="border border-gray-300 px-4 py-2">{{ $product->name }}</td>
                         <td class="border border-gray-300 px-4 py-2">{{ \Illuminate\Support\Str::words($product->description, 10, '...') }}</td>
@@ -216,6 +217,7 @@
                 @endforelse
             </tbody>
         </table>
+        </div>
 
         <div class="mt-6">
             {{ $products->links('pagination::tailwind') }}
@@ -319,8 +321,8 @@
             document.getElementById('product-name').value = name;
             document.getElementById('product-description').value = desc;
             document.getElementById('product-price').value = price;
-            document.getElementById('product-image-preview').src = '/storage/' + image;
-            document.getElementById('product-measurement-preview').src = measurement ? ('/storage/' + measurement) : '';
+            document.getElementById('product-image-preview').src = '/files/' + image;
+            document.getElementById('product-measurement-preview').src = measurement ? ('/files/' + measurement) : '';
 
             // Reset sizes: all unchecked, stock = 0, hidden
             Object.keys(@json($sizeNames)).forEach(size => {
