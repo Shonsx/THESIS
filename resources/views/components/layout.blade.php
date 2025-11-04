@@ -25,7 +25,7 @@
                                 <a href="{{ route('addProduct') }}" class="w-30 px-4 py-2 border bg-[#8c8c8c] text-center text-black rounded-xl transition duration-500 hover:bg-[#00c7c7] hover:text-white">Add Product</a>
                             </li>
                             <li>
-                                <a href="{{ route('gcash.index') }}" class="w-30 px-4 py-2 border bg-[#00c7c7] text-center text-white rounded-xl transition duration-500 hover:bg-[#FFD700] hover:text-black">GCASH</a>
+                                <a href="{{ route('gcash.index') }}" class="w-30 px-4 py-2 border bg-[#007DFE] text-center text-white rounded-xl transition duration-500 hover:bg-[#FFFFFF] hover:text-black">GCASH</a>
                             </li>
                         @elseif(auth()->user()->role == 'manager')
                             <li>
@@ -214,8 +214,8 @@
                     </div>
                 </div>
             @else
-                <a href="/login" class="w-30 px-4 py-2 border bg-[#B22222] text-center text-white rounded-xl transition duration-500 hover:bg-[#00c7c7] hover:text-black">Login</a>
-                <a href="/signup" class="w-30 px-4 py-2 border bg-[#B22222] text-center text-white rounded-xl transition duration-500 hover:bg-[#00c7c7] hover:text-black">Register</a>
+                <a href="/login" class="w-30 px-4 py-2 border bg-[#B22222] text-center text-white rounded-xl transition duration-500 hover:bg-[#FAC000] hover:text-black">Login</a>
+                <a href="/signup" class="w-30 px-4 py-2 border bg-[#B22222] text-center text-white rounded-xl transition duration-500 hover:bg-[#FAC000] hover:text-black">Register</a>
             @endauth
         </ul>
         </nav>
