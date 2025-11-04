@@ -155,8 +155,8 @@
                             </div>
                         </div>
                     @else
-                        <a href="/login" class="w-30 px-4 py-2 border bg-[#FAC000] text-center text-black rounded-xl transition duration-500 hover:bg-[#00c7c7] hover:text-white">Login</a>
-                        <a href="/signup" class="w-30 px-4 py-2 border bg-[#FAC000] text-center text-black rounded-xl transition duration-500 hover:bg-[#00c7c7] hover:text-white">Register</a>
+                        <a href="/login" class="w-30 px-4 py-2 border bg-[#8c8c8c] text-center text-black rounded-xl transition duration-500 hover:bg-[#FAC000] hover:text-white">Login</a>
+                        <a href="/signup" class="w-30 px-4 py-2 border bg-[#8c8c8c] text-center text-black rounded-xl transition duration-500 hover:bg-[#FAC000] hover:text-white">Register</a>
                     @endauth
                 </ul>
                 <!-- Mobile Menu Button (moved inside for right alignment on small screens) -->
