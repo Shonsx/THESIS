@@ -38,12 +38,19 @@
         tr:nth-child(even) td {
             background-color: #f9f9f9;
         }
+
+        /* Ensure top analytics render as 4 columns even if Tailwind build is stale */
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 1rem;
+        }
     </style>
 
     <div class="container mx-auto p-6">
         <!-- Analytics Overview -->
         <div class="mb-6">
-            <div class="grid grid-cols-4 gap-4">
+            <div class="analytics-grid">
                 <div class="bg-red-300 shadow rounded p-4">
                     <div class="text-black text-sm">Current Online</div>
                     <div class="text-2xl font-bold" id="current-online-count">{{ $currentOnline }}</div>
