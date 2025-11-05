@@ -1,5 +1,6 @@
 set -euo pipefail
-cd /var/www/etry
+APP_DIR="/home/u225827314/domains/cspot-etry.com/public_html"
+cd "$APP_DIR"
 
 php -v
 php artisan --version

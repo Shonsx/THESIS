@@ -113,6 +113,7 @@ Route::get('/etry/gcash', function () {
 })->name('gcash.page');
 Route::get('/gcash', [GCashController::class, 'index'])->name('gcash.index');
 Route::post('/gcash', [GCashController::class, 'store'])->name('gcash.store');
+Route::delete('/gcash', [GCashController::class, 'destroy'])->name('gcash.destroy');
 
 // Serve files from storage/app/public without relying on web server symlink
 // More tolerant: accepts paths like "products/foo.webp", "storage/products/foo.webp", or just "foo.webp"

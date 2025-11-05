@@ -10,12 +10,19 @@
 
         @if($gcash?->image_path)
             <div class="mb-6 text-center">
-                <h5 class="font-semibold mb-3">Current GCash Image:</h5>
+                <h5 class="font-semibold mb-3">Current QR GCash Image:</h5>
                 <img src="{{ route('files.public', ['path' => $gcash->image_path]) }}" alt="GCash QR"
                      class="mx-auto rounded shadow max-w-xs">
+                <form action="{{ route('gcash.destroy') }}" method="POST" class="mt-4 inline-block">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+                        Remove QR Image
+                    </button>
+                </form>
             </div>
         @else
-            <p class="text-gray-500 mb-6">No GCash image uploaded yet.</p>
+            <p class="text-gray-500 mb-6">No GCash QR image uploaded yet.</p>
         @endif
 
         <form action="{{ route('gcash.store') }}" method="POST" enctype="multipart/form-data"
@@ -31,7 +38,7 @@
                 type="submit"
                 class="w-full bg-gray-800 text-white py-2 rounded hover:bg-cyan-500 transition duration-300"
             >
-                Upload GCash Image
+                Upload GCash QR Image
             </button>
         </form>
     </div>

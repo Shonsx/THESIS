@@ -38,4 +38,18 @@ class GCashController extends Controller
 
         return redirect()->route('gcash.index')->with('success', 'GCash image uploaded successfully!');
     }
+
+    public function destroy()
+    {
+        $gcash = GCash::latest()->first();
+        if ($gcash) {
+            if ($gcash->image_path && Storage::disk('public')->exists($gcash->image_path)) {
+                Storage::disk('public')->delete($gcash->image_path);
+            }
+            $gcash->image_path = null;
+            $gcash->save();
+        }
+
+        return redirect()->route('gcash.index')->with('success', 'GCash QR image removed.');
+    }
 }
