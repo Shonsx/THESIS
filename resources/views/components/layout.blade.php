@@ -343,20 +343,21 @@
             const notificationBellButtons = Array.from(document.querySelectorAll('button[onclick="toggleNotifications()"]'));
             const cartDropdown = document.getElementById('cartDropdown');
             const cartButton = document.querySelector('button[onclick="toggleCart()"]');
-            
-            // Close notification dropdown
-            notificationDropdowns.forEach((dropdown) => {
-                const bell = notificationBellButtons.find(btn => true);
-                if (dropdown && bell) {
-                    if (!dropdown.contains(event.target) && !bell.contains(event.target)) {
-                        dropdown.classList.add('hidden');
-                    }
-                }
-            });
-            
-            // Close cart dropdown (if present)
+
+            // Determine if click was inside any notification dropdown or on any bell button
+            const clickedInsideNotification = notificationDropdowns.some(dd => dd && dd.contains(event.target));
+            const clickedOnBell = notificationBellButtons.some(btn => btn && btn.contains(event.target));
+
+            // Close all notification dropdowns only when clicking outside both dropdowns and bells
+            if (!clickedInsideNotification && !clickedOnBell) {
+                notificationDropdowns.forEach(dd => dd.classList.add('hidden'));
+            }
+
+            // Close cart dropdown (if present) when clicking outside
             if (cartDropdown && cartButton) {
-                if (!cartDropdown.contains(event.target) && !cartButton.contains(event.target)) {
+                const clickedInsideCart = cartDropdown.contains(event.target);
+                const clickedOnCartButton = cartButton.contains(event.target);
+                if (!clickedInsideCart && !clickedOnCartButton) {
                     cartDropdown.classList.add('hidden');
                 }
             }

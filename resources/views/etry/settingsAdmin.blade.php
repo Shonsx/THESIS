@@ -97,11 +97,11 @@
                         <td class="p-2">
                             <form action="{{ route('update-role', $user->id) }}" method="POST">
                                 @csrf
-                                <select name="role" class="border rounded p-1 w-full sm:w-auto">
+                                <select name="role" class="border rounded p-1 w-auto">
                                     <option value="manager" {{ $user->role == 'manager' ? 'selected' : '' }}>Manager</option>
                                     <option value="customer" {{ $user->role == 'customer' ? 'selected' : '' }}>Customer</option>
                                 </select>
-                                <button type="submit" class="mt-2 sm:mt-0 sm:ml-2 bg-blue-500 text-white px-2 py-1 rounded w-full sm:w-auto">Update</button>
+                                <button type="submit" class="mt-2 sm:mt-0 sm:ml-2 bg-blue-500 text-white px-2 py-1 rounded w-auto">Update</button>
                             </form>
                         </td>
                     </tr>
