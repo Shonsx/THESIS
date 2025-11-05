@@ -252,6 +252,15 @@
                         </div>
                     </div>
 
+                    @if(auth()->user()->role === 'manager')
+                    <!-- Manager: Pending Orders quick button (mobile) -->
+                    <div class="flex-shrink-0">
+                        <a href="{{ route('cashier.main') }}" class="px-3 py-2 border bg-[#8c8c8c] text-white rounded-xl transition duration-300 hover:bg-[#00c7c7] hover:text-white text-sm">
+                            Pending Orders
+                        </a>
+                    </div>
+                    @endif
+
                     @if(auth()->user()->role === 'customer')
                     <div class="relative">
                         <a href="{{ route('cart.show') }}" class="focus:outline-none" aria-label="Go to Cart">

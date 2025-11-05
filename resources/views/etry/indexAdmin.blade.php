@@ -168,7 +168,7 @@
         <!-- Sorting & Gender Filter -->
         <form method="GET" class="mb-4 flex items-center space-x-2 flex-wrap">
             <label for="sort" class="text-sm md:text-base">Sort by:</label>
-            <select name="sort" id="sort" onchange="this.form.submit()" class="border rounded-lg px-3 py-1 text-sm md:text-base w-full sm:w-auto">
+            <select name="sort" id="sort" onchange="this.form.submit()" class="border rounded-lg px-3 py-1 text-sm md:text-base w-auto">
                 <option value="desc" {{ $sortOption == 'desc' ? 'selected' : '' }}>Newest First</option>
                 <option value="asc" {{ $sortOption == 'asc' ? 'selected' : '' }}>Oldest First</option>
                 <option value="price_asc" {{ $sortOption == 'price_asc' ? 'selected' : '' }}>Price: Low to High</option>
@@ -176,7 +176,7 @@
             </select>
 
             <label for="gender" class="text-sm md:text-base">Filter by Gender:</label>
-            <select name="gender" id="gender" onchange="this.form.submit()" class="border rounded-lg px-3 py-1 text-sm md:text-base w-full sm:w-auto">
+            <select name="gender" id="gender" onchange="this.form.submit()" class="border rounded-lg px-3 py-1 text-sm md:text-base w-auto">
                 <option value="" {{ request('gender') == '' ? 'selected' : '' }}>All</option>
                 <option value="Men" {{ request('gender') == 'Men' ? 'selected' : '' }}>Men</option>
                 <option value="Women" {{ request('gender') == 'Women' ? 'selected' : '' }}>Women</option>
