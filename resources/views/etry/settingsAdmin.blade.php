@@ -10,6 +10,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 10px;
         }
 
         table {
@@ -42,6 +43,24 @@
         .animate-fade-in {
             animation: fadeIn 0.3s ease-out;
         }
+
+        /* Mobile responsiveness */
+        @media (max-width: 640px) {
+            .container {
+                padding: 12px;
+            }
+            .header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            input[type="text"] {
+                width: 100%;
+            }
+            th, td {
+                font-size: 0.85rem;
+                padding: 8px;
+            }
+        }
     </style>
 
     <div class="container">
@@ -58,7 +77,8 @@
             </div>
         @endif
 
-        <table class="w-full border">
+        <div class="overflow-x-auto">
+        <table class="min-w-[640px] w-full border">
             <thead>
                 <tr class="bg-gray-200">
                     <th class="p-2">Name</th>
@@ -77,12 +97,11 @@
                         <td class="p-2">
                             <form action="{{ route('update-role', $user->id) }}" method="POST">
                                 @csrf
-                                <select name="role" class="border rounded p-1">
-                                    <option value="admin" {{ $user->role == 'admin' ? 'selected' : '' }}>Admin</option>
+                                <select name="role" class="border rounded p-1 w-full sm:w-auto">
                                     <option value="manager" {{ $user->role == 'manager' ? 'selected' : '' }}>Manager</option>
                                     <option value="customer" {{ $user->role == 'customer' ? 'selected' : '' }}>Customer</option>
                                 </select>
-                                <button type="submit" class="ml-2 bg-blue-500 text-white px-2 py-1 rounded">Update</button>
+                                <button type="submit" class="mt-2 sm:mt-0 sm:ml-2 bg-blue-500 text-white px-2 py-1 rounded w-full sm:w-auto">Update</button>
                             </form>
                         </td>
                     </tr>
@@ -90,6 +109,7 @@
                 @endforeach
             </tbody>
         </table>
+        </div>
     </div>
 
     <script>

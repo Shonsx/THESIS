@@ -197,7 +197,73 @@
              </form>
 
             @auth
-                <h2 class="text-white">{{ Auth::user()->name }}</h2>
+                <!-- Mobile Notifications & Cart -->
+                <div class="flex items-center justify-between w-full">
+                    <div class="relative">
+                        <button class="focus:outline-none" onclick="toggleNotifications()" aria-expanded="false">
+                            <img src="{{ asset('icons/bell-notification.svg') }}" alt="Notifications" class="w-7 h-7 cursor-pointer">
+                        </button>
+                        @php $initialUnread = auth()->check() ? optional(auth()->user())->unreadNotifications->count() : 0; @endphp
+                        <span id="notificationBadgeMobile" class="absolute top-0 right-0 rounded-full bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center {{ ($initialUnread ?? 0) > 0 ? '' : 'hidden' }}">!</span>
+                        <!-- Mobile Notification Dropdown -->
+                        <div id="notificationDropdownMobile" class="absolute left-0 mt-2 w-72 bg-white border border-gray-300 rounded-lg shadow-lg hidden z-50" aria-hidden="true">
+                            <div class="flex justify-between items-center px-4 py-2 border-b bg-gray-100">
+                                <span class="text-sm font-semibold">Notifications</span>
+                                @if(auth()->user()->unreadNotifications->count())
+                                    <form action="{{ route('notifications.readAll') }}" method="POST">
+                                        @csrf
+                                        <button type="submit" class="text-xs text-blue-600 hover:underline">Mark all as read</button>
+                                    </form>
+                                @endif
+                            </div>
+                            <ul class="max-h-60 overflow-y-auto">
+                                @php $unread = auth()->user()->unreadNotifications; $read = auth()->user()->readNotifications; @endphp
+                                @forelse($unread as $notification)
+                                    @php $redirect = $notification->data['redirect'] ?? null; @endphp
+                                    <li class="px-4 py-2 border-b" style="opacity: 1;">
+                                        @if ($redirect)
+                                            <a href="{{ route('notifications.read', $notification->id) }}?redirect={{ urlencode($redirect) }}" class="block text-sm text-blue-700 hover:underline notification-link">
+                                                {{ $notification->data['message'] ?? ($notification->message ?? 'New notification') }}
+                                            </a>
+                                        @else
+                                            <a href="{{ route('notifications.read', $notification->id) }}" class="block text-sm text-blue-700 hover:underline notification-link">
+                                                {{ $notification->data['message'] ?? ($notification->message ?? 'New notification') }}
+                                            </a>
+                                        @endif
+                                        <a href="{{ route('notifications.read', $notification->id) }}" class="text-xs text-blue-600">Mark as read</a>
+                                    </li>
+                                @empty
+                                    <li class="px-4 py-2 text-sm text-gray-500">No new notifications</li>
+                                @endforelse
+                                @foreach($read as $notification)
+                                    @php $redirect = $notification->data['redirect'] ?? null; @endphp
+                                    <li class="px-4 py-2 border-b" style="opacity: 0.7;">
+                                        @if ($redirect)
+                                            <a href="{{ $redirect }}" class="block text-sm text-blue-700 hover:underline notification-link">
+                                                {{ $notification->data['message'] ?? ($notification->message ?? 'Notification') }}
+                                            </a>
+                                        @else
+                                            <p class="text-sm">{{ $notification->data['message'] ?? ($notification->message ?? 'Notification') }}</p>
+                                        @endif
+                                        <span class="text-[10px] text-gray-500">{{ $notification->created_at->diffForHumans() }}</span>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    </div>
+
+                    @if(auth()->user()->role === 'customer')
+                    <div class="relative">
+                        <a href="{{ route('cart.show') }}" class="focus:outline-none" aria-label="Go to Cart">
+                            <img src="{{ asset('icons/Shopping-bag.svg') }}" alt="Shopping Cart" class="w-9 h-9 cursor-pointer">
+                        </a>
+                        @php $cartCount = \App\Models\Cart::where('user_id', auth()->id())->count(); @endphp
+                        <span id="cartBadgeMobile" class="absolute top-0 right-0 rounded-full bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center {{ $cartCount > 0 ? '' : 'hidden' }}">{{ $cartCount }}</span>
+                    </div>
+                    @endif
+                </div>
+
+                <h2 class="text-white w-full">{{ Auth::user()->name }}</h2>
                 <div class="relative w-full">
                     <button id="dropdownBtnMobile" class="focus:outline-none w-full text-left">
                         <img src="{{ asset('icons/arrow-drop-down-svgrepo-com(w).svg') }}" 
@@ -233,12 +299,15 @@
 
         // --------DROPDOWN FOR NOTIFICATION BELL--------
         function toggleNotifications() {
-            const dropdown = document.getElementById('notificationDropdown');
-            const button = document.querySelector('button[onclick="toggleNotifications()"]');
-            dropdown.classList.toggle('hidden');
-            const isExpanded = dropdown.classList.contains('hidden');
-            button.setAttribute('aria-expanded', !isExpanded);
-            dropdown.setAttribute('aria-hidden', isExpanded);
+            const dropdownDesktop = document.getElementById('notificationDropdown');
+            const dropdownMobile = document.getElementById('notificationDropdownMobile');
+            [dropdownDesktop, dropdownMobile].forEach(dd => {
+                if (dd) {
+                    dd.classList.toggle('hidden');
+                    const isExpanded = dd.classList.contains('hidden');
+                    dd.setAttribute('aria-hidden', isExpanded);
+                }
+            });
         }
 
         // --------DROPDOWN FOR SHOPPING CART--------
@@ -253,17 +322,20 @@
 
         // Close notification and cart dropdowns when clicking outside
         document.addEventListener('click', function(event) {
-            const notificationDropdown = document.getElementById('notificationDropdown');
-            const notificationBell = document.querySelector('button[onclick="toggleNotifications()"]');
+            const notificationDropdowns = [document.getElementById('notificationDropdown'), document.getElementById('notificationDropdownMobile')].filter(Boolean);
+            const notificationBellButtons = Array.from(document.querySelectorAll('button[onclick="toggleNotifications()"]'));
             const cartDropdown = document.getElementById('cartDropdown');
             const cartButton = document.querySelector('button[onclick="toggleCart()"]');
             
             // Close notification dropdown
-            if (notificationDropdown && notificationBell) {
-                if (!notificationDropdown.contains(event.target) && !notificationBell.contains(event.target)) {
-                    notificationDropdown.classList.add('hidden');
+            notificationDropdowns.forEach((dropdown) => {
+                const bell = notificationBellButtons.find(btn => true);
+                if (dropdown && bell) {
+                    if (!dropdown.contains(event.target) && !bell.contains(event.target)) {
+                        dropdown.classList.add('hidden');
+                    }
                 }
-            }
+            });
             
             // Close cart dropdown (if present)
             if (cartDropdown && cartButton) {
@@ -293,8 +365,8 @@
         }
 
         async function updateRealtimeBadges() {
-            const notificationBadge = document.getElementById('notificationBadge');
-            const cartBadge = document.getElementById('cartBadge');
+            const notificationBadges = [document.getElementById('notificationBadge'), document.getElementById('notificationBadgeMobile')].filter(Boolean);
+            const cartBadges = [document.getElementById('cartBadge'), document.getElementById('cartBadgeMobile')].filter(Boolean);
 
             const notifUrl = '{{ auth()->check() ? route('notifications.count') : '' }}';
             const cartUrl = '{{ auth()->check() ? route('cart.count') : '' }}';
@@ -304,25 +376,28 @@
                 cartUrl ? fetchJSON(cartUrl) : Promise.resolve(null)
             ]);
 
-            if (notifData && notificationBadge) {
+            if (notifData) {
                 const unread = Number(notifData.unread || 0);
-                if (unread > 0) {
-                    // Keep design using '!'
-                    notificationBadge.textContent = '!';
-                    notificationBadge.classList.remove('hidden');
-                } else {
-                    notificationBadge.classList.add('hidden');
-                }
+                notificationBadges.forEach(badge => {
+                    if (unread > 0) {
+                        badge.textContent = '!';
+                        badge.classList.remove('hidden');
+                    } else {
+                        badge.classList.add('hidden');
+                    }
+                });
             }
 
-            if (cartData && cartBadge) {
+            if (cartData) {
                 const count = Number(cartData.count || 0);
-                if (count > 0) {
-                    cartBadge.textContent = String(count);
-                    cartBadge.classList.remove('hidden');
-                } else {
-                    cartBadge.classList.add('hidden');
-                }
+                cartBadges.forEach(badge => {
+                    if (count > 0) {
+                        badge.textContent = String(count);
+                        badge.classList.remove('hidden');
+                    } else {
+                        badge.classList.add('hidden');
+                    }
+                });
             }
         }
 

@@ -45,6 +45,17 @@
             grid-template-columns: repeat(4, minmax(0, 1fr));
             gap: 1rem;
         }
+
+        /* Responsive fallbacks for analytics grid */
+        @media (max-width: 640px) {
+            .analytics-grid { grid-template-columns: 1fr; }
+        }
+        @media (min-width: 640px) and (max-width: 1024px) {
+            .analytics-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+        @media (min-width: 1024px) {
+            .analytics-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+        }
     </style>
 
     <div class="container mx-auto p-6">
@@ -155,9 +166,9 @@
         <h1 class="text-2xl font-bold mb-6">Admin - Product Management</h1>
 
         <!-- Sorting & Gender Filter -->
-        <form method="GET" class="mb-4 flex items-center space-x-2">
+        <form method="GET" class="mb-4 flex items-center space-x-2 flex-wrap">
             <label for="sort" class="text-sm md:text-base">Sort by:</label>
-            <select name="sort" id="sort" onchange="this.form.submit()" class="border rounded-lg px-3 py-1 text-sm md:text-base">
+            <select name="sort" id="sort" onchange="this.form.submit()" class="border rounded-lg px-3 py-1 text-sm md:text-base w-full sm:w-auto">
                 <option value="desc" {{ $sortOption == 'desc' ? 'selected' : '' }}>Newest First</option>
                 <option value="asc" {{ $sortOption == 'asc' ? 'selected' : '' }}>Oldest First</option>
                 <option value="price_asc" {{ $sortOption == 'price_asc' ? 'selected' : '' }}>Price: Low to High</option>
@@ -165,7 +176,7 @@
             </select>
 
             <label for="gender" class="text-sm md:text-base">Filter by Gender:</label>
-            <select name="gender" id="gender" onchange="this.form.submit()" class="border rounded-lg px-3 py-1 text-sm md:text-base">
+            <select name="gender" id="gender" onchange="this.form.submit()" class="border rounded-lg px-3 py-1 text-sm md:text-base w-full sm:w-auto">
                 <option value="" {{ request('gender') == '' ? 'selected' : '' }}>All</option>
                 <option value="Men" {{ request('gender') == 'Men' ? 'selected' : '' }}>Men</option>
                 <option value="Women" {{ request('gender') == 'Women' ? 'selected' : '' }}>Women</option>

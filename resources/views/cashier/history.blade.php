@@ -29,19 +29,19 @@
         @endif
 
         <div class="bg-white p-4 rounded-lg shadow-md mx-auto w-full">
-            <div class="flex justify-end items-center gap-2 mb-4">
+            <div class="flex justify-end items-center gap-2 mb-4 flex-wrap">
                 <!-- Customer Name Search -->
                 <input 
                     type="text" 
                     id="searchInput" 
                     placeholder="Search Customer Name" 
-                    class="border border-gray-300 rounded px-3 py-1 focus:outline-none focus:ring focus:border-blue-300"
+                    class="border border-gray-300 rounded px-3 py-1 focus:outline-none focus:ring focus:border-blue-300 w-full sm:w-auto"
                 >
 
                 <!-- Date Filter -->
                 <select 
                     id="dateFilter" 
-                    class="border border-gray-300 rounded px-3 py-1 focus:outline-none focus:ring focus:border-blue-300"
+                    class="border border-gray-300 rounded px-3 py-1 focus:outline-none focus:ring focus:border-blue-300 w-full sm:w-auto"
                 >
                     <option value="all">All Dates</option>
                     <option value="today">Today</option>
@@ -53,11 +53,12 @@
                 <input 
                     type="date" 
                     id="customDate" 
-                    class="border border-gray-300 rounded px-3 py-1 hidden"
+                    class="border border-gray-300 rounded px-3 py-1 hidden w-full sm:w-auto"
                 >
             </div>
 
-            <table class="table-auto w-full border-collapse border border-gray-300">
+            <div class="overflow-x-auto">
+            <table class="min-w-[800px] w-full border-collapse border border-gray-300">
                 <thead>
                     <tr class="bg-gray-200">
                         <th class="border px-4 py-2 text-center">Customer Name</th>
@@ -96,6 +97,7 @@
                     @endforeach
                 </tbody>
             </table>
+            </div>
         </div>
 
         @if($processedOrders->isEmpty())

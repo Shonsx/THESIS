@@ -35,7 +35,7 @@
                         </div>
 
                         <!-- Bulk Actions -->
-                        <div class="flex space-x-4 mt-6">
+                        <div class="flex flex-col sm:flex-row sm:space-x-4 space-y-3 sm:space-y-0 mt-6">
                             <button type="submit" name="action" value="buy"
                                 class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
                                 Buy Selected
@@ -63,8 +63,8 @@
                 <h2 class="text-xl font-bold mb-4 border-b pb-2">🧾 Your Order History</h2>
 
                 @if($userOrders && $userOrders->count() > 0)
-                    <div class="order-history">
-                        <table class="table-auto w-full border-collapse border border-gray-300">
+                    <div class="order-history overflow-x-auto">
+                        <table class="table-auto min-w-[700px] w-full border-collapse border border-gray-300">
                             <thead>
                                 <tr class="bg-gray-200">
                                     <th class="border px-4 py-2 text-center">Product Image</th> <!-- Changed header -->
