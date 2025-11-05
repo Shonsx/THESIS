@@ -43,7 +43,7 @@
     <div class="container mx-auto p-6">
         <!-- Analytics Overview -->
         <div class="mb-6">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="grid grid-cols-4 gap-4">
                 <div class="bg-red-300 shadow rounded p-4">
                     <div class="text-black text-sm">Current Online</div>
                     <div class="text-2xl font-bold" id="current-online-count">{{ $currentOnline }}</div>
@@ -82,6 +82,31 @@
                         @empty
                             <tr>
                                 <td colspan="2" class="text-center text-gray-500 px-4 py-2">No analytics data yet.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Content Interactions History -->
+            <div class="mt-4 bg-white shadow rounded p-4 overflow-x-auto">
+                <h2 class="text-lg font-semibold mb-2">Daily Content Interactions (Last 30 Days)</h2>
+                <table class="w-full border-collapse border border-gray-200">
+                    <thead>
+                        <tr class="bg-gray-100">
+                            <th class="border border-gray-200 px-4 py-2 text-left">Date</th>
+                            <th class="border border-gray-200 px-4 py-2 text-left">Interactions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($dailyInteractionHistory as $row)
+                            <tr>
+                                <td class="border border-gray-200 px-4 py-2">{{ \Carbon\Carbon::parse($row->date)->format('M d, Y') }}</td>
+                                <td class="border border-gray-200 px-4 py-2">{{ $row->count }}</td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="2" class="text-center text-gray-500 px-4 py-2">No interaction data yet.</td>
                             </tr>
                         @endforelse
                     </tbody>
