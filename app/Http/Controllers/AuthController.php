@@ -45,17 +45,28 @@ class AuthController extends Controller
 
     public function login(Request $request) {
         $request->validate([
-            'email'=> 'required|email',
-            'password'=> 'required',
+            'identifier' => 'required|string',
+            'password'   => 'required',
         ]);
 
-        $user = User::where('email', $request->email)->first();
+        $identifier = $request->input('identifier');
+        $remember = $request->boolean('remember');
+
+        // Decide whether identifier is email or username (name)
+        $isEmail = filter_var($identifier, FILTER_VALIDATE_EMAIL) !== false;
+        $credentials = $isEmail
+            ? ['email' => $identifier, 'password' => $request->password]
+            : ['name' => $identifier, 'password' => $request->password];
+
+        // Check existence for friendlier error
+        $user = $isEmail
+            ? User::where('email', $identifier)->first()
+            : User::where('name', $identifier)->first();
         if (!$user) {
             return back()->with('error', 'Account has not been registered ⚠️');
         }
 
-        $remember = $request->boolean('remember');
-        if (Auth::attempt(['email' => $request->email, 'password' => $request->password], $remember)) {
+        if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
 
             // ✅ Check role after login
@@ -69,7 +80,7 @@ class AuthController extends Controller
             return redirect()->route('products.index'); // normal users
         }
 
-        return back()->with('error','Invalid email or password ⚠️');
+        return back()->with('error','Invalid username/email or password ⚠️');
     }
 
     public function adminLogin(Request $request) {
