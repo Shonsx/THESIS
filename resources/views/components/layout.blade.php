@@ -147,7 +147,11 @@
                             </button>
                             <div id="dropdownMenuDesktop" class="absolute right-0 mt-2 w-40 bg-white border border-gray-300 rounded-lg shadow-lg hidden z-50">
                                 <a href="{{ route('account') }}" class="block px-4 py-2 hover:bg-gray-100">Account</a>
-                                <a href="{{ auth()->user()->role == 'admin' ? route('settings.admin') : route('settings.account') }}" class="block px-4 py-2 hover:bg-gray-100">Settings</a>
+                                @if(auth()->user()->role == 'admin')
+                                    <a href="{{ route('settings.admin') }}" class="block px-4 py-2 hover:bg-gray-100">Settings</a>
+                                @elseif(auth()->user()->role == 'customer')
+                                    <a href="{{ route('settings.account') }}" class="block px-4 py-2 hover:bg-gray-100">Settings</a>
+                                @endif
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
                                     <button type="submit" class="block w-full text-left px-4 py-2 hover:bg-gray-100">Logout</button>
@@ -281,7 +285,11 @@
                     </button>
                     <div id="dropdownMenuMobile" class="hidden bg-white border border-gray-300 rounded-lg shadow-lg w-full">
                         <a href="{{ route('account') }}" class="block px-4 py-2 hover:bg-gray-100">Account</a>
-                        <a href="{{ auth()->user()->role == 'admin' ? route('settings.admin') : route('settings.account') }}" class="block px-4 py-2 hover:bg-gray-100">Settings</a>
+                        @if(auth()->user()->role == 'admin')
+                            <a href="{{ route('settings.admin') }}" class="block px-4 py-2 hover:bg-gray-100">Settings</a>
+                        @elseif(auth()->user()->role == 'customer')
+                            <a href="{{ route('settings.account') }}" class="block px-4 py-2 hover:bg-gray-100">Settings</a>
+                        @endif
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <button type="submit" class="block w-full text-left px-4 py-2 hover:bg-gray-100">Logout</button>

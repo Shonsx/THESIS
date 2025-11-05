@@ -35,13 +35,13 @@
                     type="text" 
                     id="searchInput" 
                     placeholder="Search Customer Name" 
-                    class="border border-gray-300 rounded px-3 py-1 focus:outline-none focus:ring focus:border-blue-300 w-full sm:w-auto"
+                    class="border border-gray-300 rounded px-3 py-1 focus:outline-none focus:ring focus:border-blue-300 w-auto"
                 >
 
                 <!-- Date Filter -->
                 <select 
                     id="dateFilter" 
-                    class="border border-gray-300 rounded px-3 py-1 focus:outline-none focus:ring focus:border-blue-300 w-full sm:w-auto"
+                    class="border border-gray-300 rounded px-3 py-1 focus:outline-none focus:ring focus:border-blue-300 w-auto"
                 >
                     <option value="all">All Dates</option>
                     <option value="today">Today</option>
@@ -53,7 +53,7 @@
                 <input 
                     type="date" 
                     id="customDate" 
-                    class="border border-gray-300 rounded px-3 py-1 hidden w-full sm:w-auto"
+                    class="border border-gray-300 rounded px-3 py-1 hidden w-auto"
                 >
             </div>
 
