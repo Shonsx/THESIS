@@ -134,7 +134,6 @@
                 <div class="bg-white rounded-lg shadow-lg p-6 mb-12">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="text-xl font-bold">Customer Reviews</h3>
-                        <a href="{{ route('reviews.create', $product->id) }}" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">Add a Review</a>
                     </div>
                     @if(isset($reviews) && $reviews->count() > 0)
                         <div class="space-y-4">
@@ -145,7 +144,13 @@
                                             <span class="text-yellow-500">★</span>
                                             <span class="font-semibold">{{ number_format($review->rating, 1) }}</span>
                                         </div>
-                                        <span class="text-gray-500 text-sm">by {{ $review->user->name ?? 'Anonymous' }} • {{ $review->created_at->diffForHumans() }}</span>
+                                        @php
+                                            $reviewerName = $review->user->name ?? 'Anonymous';
+                                            if (!empty($review->is_anonymous) && $review->user && $review->user->name) {
+                                                $reviewerName = \Illuminate\Support\Str::mask($review->user->name, '*', 2);
+                                            }
+                                        @endphp
+                                        <span class="text-gray-500 text-sm">by {{ $reviewerName }} • {{ $review->created_at->diffForHumans() }}</span>
                                     </div>
                                     @if($review->comment)
                                         <p class="mt-2 text-gray-700">{{ $review->comment }}</p>

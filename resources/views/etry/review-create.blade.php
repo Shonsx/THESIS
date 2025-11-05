@@ -40,6 +40,23 @@
                         @enderror
                     </div>
 
+                    <div>
+                        <label class="block font-semibold mb-2">Display name</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center space-x-2">
+                                <input type="radio" name="is_anonymous" value="0" {{ old('is_anonymous', '0') === '0' ? 'checked' : '' }}>
+                                <span>Show my name ({{ auth()->user()->name }})</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="radio" name="is_anonymous" value="1" {{ old('is_anonymous') === '1' ? 'checked' : '' }}>
+                                <span>Anonymous (e.g., {{ \Illuminate\Support\Str::mask(auth()->user()->name ?? 'anonymous', '*', 2) }})</span>
+                            </label>
+                        </div>
+                        @error('is_anonymous')
+                            <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
                     <div class="flex justify-end">
                         <button type="submit" class="bg-yellow-500 text-white px-6 py-2 rounded hover:bg-yellow-600">Submit Review</button>
                     </div>

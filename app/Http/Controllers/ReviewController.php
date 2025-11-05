@@ -30,6 +30,7 @@ class ReviewController extends Controller
         $request->validate([
             'rating' => ['required', 'numeric', 'between:0.5,5'],
             'comment' => ['nullable', 'string', 'max:1000'],
+            'is_anonymous' => ['nullable','boolean'],
         ]);
 
         // Enforce half-star increments
@@ -43,6 +44,7 @@ class ReviewController extends Controller
             'user_id' => $user->id,
             'rating' => $rating,
             'comment' => $request->input('comment'),
+            'is_anonymous' => $request->boolean('is_anonymous'),
         ]);
 
         return redirect()->route('products.show', $product->id)->with('success', 'Thank you for your review!');
