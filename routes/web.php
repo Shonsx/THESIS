@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\InteractionController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AdminController;
@@ -294,4 +295,5 @@ Route::post('/notifications/read-all', [NotificationController::class, 'markAllA
 Route::middleware(['web'])->group(function () {
     Route::post('/analytics/heartbeat', [\App\Http\Controllers\ProductController::class, 'heartbeat'])->name('analytics.heartbeat');
     Route::get('/analytics/online-count', [\App\Http\Controllers\ProductController::class, 'onlineCount'])->name('analytics.onlineCount');
+    Route::post('/analytics/interaction', [InteractionController::class, 'record'])->name('analytics.interaction');
 });

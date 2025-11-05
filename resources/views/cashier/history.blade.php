@@ -66,7 +66,7 @@
                         <th class="border px-4 py-2 text-center">Size</th>
                         <th class="border px-4 py-2 text-center">Quantity</th>
                         <th class="border px-4 py-2 text-center">Total Price</th>
-                        <th class="border px-4 py-2 text-center">Completed At</th>
+                        <th class="border px-4 py-2 text-center">Approved At</th>
                     </tr>
                 </thead>
                 <tbody>

@@ -43,10 +43,17 @@
     <div class="container mx-auto p-6">
         <!-- Analytics Overview -->
         <div class="mb-6">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div class="bg-red-300 shadow rounded p-4">
                     <div class="text-black text-sm">Current Online</div>
                     <div class="text-2xl font-bold" id="current-online-count">{{ $currentOnline }}</div>
+                </div>
+
+                <!-- Content Interactions -->
+                <div class="bg-blue-300 shadow rounded p-4">
+                    <div class="text-black text-sm">Content Interactions (Today)</div>
+                    <div class="text-2xl font-bold">{{ $todayInteractions }}</div>
+                    <div class="text-black text-xs mt-1">Total: {{ $totalInteractions }}</div>
                 </div>
                 <div class="bg-blue-300 shadow rounded p-4">
                     <div class="text-black text-sm">Today's Unique Visitors</div>

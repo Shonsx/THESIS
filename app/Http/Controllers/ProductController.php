@@ -100,6 +100,10 @@ use App\Models\Order;
             ->limit(30)
             ->get();
 
+        // Content interactions (Buy Now clicks)
+        $todayInteractions = \App\Models\ContentInteraction::whereDate('created_at', now())->count();
+        $totalInteractions = \App\Models\ContentInteraction::count();
+
         // Sales analysis: processed orders totals
         $todayProcessedSales = Order::where('processed', true)
             ->whereDate('updated_at', now())
@@ -111,7 +115,7 @@ use App\Models\Order;
             ->limit(30)
             ->get();
 
-        return view('etry.indexAdmin', compact('products', 'sortOption', 'genderFilter', 'cartItemIds', 'currentOnline', 'todayVisitors', 'dailyHistory', 'todayProcessedSales', 'dailySalesHistory'));
+        return view('etry.indexAdmin', compact('products', 'sortOption', 'genderFilter', 'cartItemIds', 'currentOnline', 'todayVisitors', 'dailyHistory', 'todayProcessedSales', 'dailySalesHistory', 'todayInteractions', 'totalInteractions'));
     }
 
     public function indexManager(Request $request)

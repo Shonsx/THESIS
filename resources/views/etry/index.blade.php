@@ -153,7 +153,7 @@
                     @if($outOfStock)
                         <span class="bg-red-500 text-white w-full py-2 rounded-lg mt-auto text-sm md:text-base text-center block">Out of Stock</span>
                     @else
-                        <a href="{{ route('products.show', $product->id) }}" class="bg-white text-black border-2 w-full py-2 rounded-lg hover:bg-[#FAC000] mt-auto text-sm md:text-base text-center block duration-100">Buy Now</a>
+                        <a href="{{ route('products.show', $product->id) }}" class="bg-white text-black border-2 w-full py-2 rounded-lg hover:bg-[#FAC000] mt-auto text-sm md:text-base text-center block duration-100" onclick="recordInteraction({{ $product->id }})">Buy Now</a>
                     @endif
                 </div>
             @endforeach
@@ -178,6 +178,26 @@
 
     <!-- JavaScript -->
     <script>
+        function recordInteraction(productId) {
+            try {
+                const url = '/analytics/interaction';
+                const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                const body = new URLSearchParams({
+                    product_id: String(productId),
+                    _token: token,
+                });
+                // Use fetch with keepalive to avoid blocking navigation
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: body.toString(),
+                    keepalive: true,
+                    credentials: 'same-origin',
+                }).catch(() => {});
+            } catch (e) {}
+        }
         function toggleCartIcon(button, productId) {
             const img = button.querySelector('.cart-icon');
             fetch(`/cart/add/${productId}`, {
