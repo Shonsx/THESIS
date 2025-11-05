@@ -13,7 +13,11 @@
     <header>
         <nav class="bg-[#000000] py-2 px-4 relative z-40">
             <div class="flex justify-between items-center">
-                <div class="flex items-center space-x-2 cursor-pointer" onclick="window.location.href='/'">
+                @php
+                    $role = auth()->check() ? auth()->user()->role : null;
+                    $logoClickable = !in_array($role, ['admin','manager']);
+                @endphp
+                <div class="flex items-center space-x-2 {{ $logoClickable ? 'cursor-pointer' : '' }}" @if($logoClickable) onclick="window.location.href='/'" @endif>
                     <img src="{{asset('images/E-LOGO-removebg-preview.png')}}" alt="E-Try" class="w-auto h-15 scale-125">
                 </div>
         
