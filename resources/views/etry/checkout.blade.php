@@ -22,7 +22,7 @@
         }
     </style>
 
-    <div class="container mx-auto p-4 pb-24 sm:pb-4">
+    <div class="container mx-auto p-4 pb-24 sm:pb-4" style="padding-bottom: calc(96px + env(safe-area-inset-bottom));">
         <h1 class="text-2xl font-bold mb-4 text-center">🛒 Checkout</h1>
 
         <form action="{{ route('checkout.process') }}" method="POST" enctype="multipart/form-data">
@@ -142,7 +142,7 @@
                 </div>
             </div>
             <!-- Mobile fixed bottom action bar -->
-            <div class="sm:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur border-t border-gray-200 p-3 z-50">
+            <div class="sm:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur border-t border-gray-200 p-3 z-50" style="padding-bottom: env(safe-area-inset-bottom);">
                 <div class="flex items-center justify-between">
                     <div class="text-sm">
                         <span class="font-semibold">Total:</span>
