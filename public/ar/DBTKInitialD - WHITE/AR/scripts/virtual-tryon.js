@@ -34,7 +34,7 @@ export class VirtualTryOn {
     this.smoothingFactor = 0.6;
     this.isLoading = true;
     // Default model path (will be overridden by candidates below)
-    this.modelPath = 'DBTK.glb';
+    this.modelPath = 'DBTKInitialD.glb';
 
     // Build candidate GLB filenames to handle varying product names
     try {

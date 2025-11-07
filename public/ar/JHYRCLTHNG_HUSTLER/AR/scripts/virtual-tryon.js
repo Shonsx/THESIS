@@ -34,7 +34,7 @@ export class VirtualTryOn {
     this.smoothingFactor = 0.6;
     this.isLoading = true;
     // Sean eto yung path paltan paltan mo
-    this.modelPath = 'DBTK.glb';
+    this.modelPath = 'JeepPahinga.glb';
 
     // Body tracking properties
     this.bodyPosition = new THREE.Vector3(0, 0, 0);
