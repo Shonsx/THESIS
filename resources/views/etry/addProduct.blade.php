@@ -72,8 +72,15 @@
             </div>
 
             <div class="mb-4">
-                <label for="extra_images" class="block text-sm font-medium text-gray-700">More Product images</label>
-                <input type="file" name="extra_images[]" id="extra_images" multiple class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 cursor-pointer hover:border-blue-500" accept="image/*">
+                <label class="block text-sm font-medium text-gray-700">More Product images</label>
+                <p class="text-xs text-gray-500 mb-2">You can upload up to 6 images.</p>
+                <div id="extraImagesContainer" class="space-y-2">
+                    <input type="file" name="extra_images[]" accept="image/*" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 cursor-pointer hover:border-blue-500">
+                </div>
+                <div class="flex items-center justify-between mt-2">
+                    <button type="button" id="addExtraImageBtn" class="px-3 py-1 bg-gray-800 text-white rounded hover:bg-[#00c7c7] transition">Add another image</button>
+                    <span class="text-xs text-gray-600">Selected: <span id="extraImagesCount">0</span>/6</span>
+                </div>
             </div>
             <button type="submit" class="w-full px-3 py-2 bg-[#B22222] text-white rounded-md hover:bg-[#00c7c7] transition duration-500">Add Product</button>
         </form>
@@ -99,5 +106,45 @@
         });
     });
 
+</script>
+<script>
+    (function() {
+        const maxExtra = 6;
+        const container = document.getElementById('extraImagesContainer');
+        const addBtn = document.getElementById('addExtraImageBtn');
+        const countEl = document.getElementById('extraImagesCount');
+
+        function updateCount() {
+            let total = 0;
+            container.querySelectorAll('input[type="file"]').forEach(inp => {
+                total += (inp.files ? inp.files.length : 0);
+            });
+            countEl.textContent = total;
+            addBtn.disabled = total >= maxExtra || container.querySelectorAll('input[type="file"]').length >= maxExtra;
+        }
+
+        function addExtraInput() {
+            // Prevent exceeding max number of inputs
+            if (container.querySelectorAll('input[type="file"]').length >= maxExtra) return;
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.name = 'extra_images[]';
+            input.accept = 'image/*';
+            input.className = 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 cursor-pointer hover:border-blue-500';
+            input.addEventListener('change', updateCount);
+            container.appendChild(input);
+        }
+
+        // Hook up initial input
+        const initial = container.querySelector('input[type="file"]');
+        if (initial) initial.addEventListener('change', updateCount);
+
+        addBtn.addEventListener('click', () => {
+            addExtraInput();
+        });
+
+        // Initial state
+        updateCount();
+    })();
 </script>
 </x-layout>

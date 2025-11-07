@@ -124,6 +124,7 @@
                                     data-price="{{ $product->price }}"
                                     data-image="{{ $product->image }}"
                                     data-measurement="{{ $product->measurement_image }}"
+                                    data-extra-images='@json($product->extra_images)'
                                     data-sizes='@json($sizeStocks)'
                                     onclick="openEditModal(this)">
                                     Edit
@@ -201,6 +202,15 @@
                     <input type="file" name="measurement_image" class="w-full border p-2 rounded">
                 </div>
 
+                <div class="mb-3">
+                    <label class="block text-sm">Extra Images</label>
+                    <p class="text-xs text-gray-600 mb-1">Check images you want to remove. You can upload new ones below. Max 6 total.</p>
+                    <div id="extra-images-list" class="grid grid-cols-3 gap-2 mb-2">
+                        <!-- thumbnails with remove checkboxes will be injected -->
+                    </div>
+                    <input type="file" name="extra_images[]" accept="image/*" multiple class="w-full border p-2 rounded">
+                </div>
+
                 <div class="flex justify-end space-x-2 sticky bottom-0 bg-white pt-2">
                     <button type="button" onclick="closeModal('edit-modal')" class="bg-gray-300 px-3 py-1 rounded">Cancel</button>
                     <button type="submit" class="bg-blue-500 text-white px-3 py-1 rounded">Save</button>
@@ -238,6 +248,7 @@
             const price = button.dataset.price;
             const image = button.dataset.image;
             const measurement = button.dataset.measurement;
+            const extraImages = (() => { try { return JSON.parse(button.dataset.extraImages || '[]'); } catch(e){ return []; } })();
 
             // Set form action and values
             const form = document.getElementById('edit-product-form');
@@ -248,6 +259,31 @@
             document.getElementById('product-price').value = price;
             document.getElementById('product-image-preview').src = '/files/' + image;
             document.getElementById('product-measurement-preview').src = measurement ? ('/files/' + measurement) : '';
+
+            // Render existing extra images with remove checkboxes
+            const extraList = document.getElementById('extra-images-list');
+            extraList.innerHTML = '';
+            if (Array.isArray(extraImages)) {
+                extraImages.forEach(path => {
+                    const wrap = document.createElement('div');
+                    wrap.className = 'border rounded p-1 flex flex-col items-center';
+                    const img = document.createElement('img');
+                    img.src = '/files/' + path;
+                    img.alt = 'extra';
+                    img.className = 'w-full h-24 object-contain mb-1';
+                    const label = document.createElement('label');
+                    label.className = 'text-xs flex items-center gap-1';
+                    const cb = document.createElement('input');
+                    cb.type = 'checkbox';
+                    cb.name = 'remove_extra_images[]';
+                    cb.value = path;
+                    label.appendChild(cb);
+                    label.appendChild(document.createTextNode('Remove'));
+                    wrap.appendChild(img);
+                    wrap.appendChild(label);
+                    extraList.appendChild(wrap);
+                });
+            }
 
             // Reset sizes: all unchecked, stock = 0, hidden
             Object.keys(@json($sizeNames)).forEach(size => {

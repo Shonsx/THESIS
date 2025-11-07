@@ -164,6 +164,14 @@ use App\Models\Order;
             abort(403, 'Unauthorized');
         }
         $product = Product::findOrFail($productId);
+        // Validate inputs related to images
+        $request->validate([
+            'image' => 'image|nullable',
+            'measurement_image' => 'image|nullable',
+            'extra_images' => 'array|nullable',
+            'extra_images.*' => 'image|nullable',
+            'remove_extra_images' => 'array|nullable',
+        ]);
         // Validate and update product details (name, description, price)
         $product->update([
             'name' => $request->input('name'),
@@ -225,6 +233,44 @@ use App\Models\Order;
 
         }
 
+        // Handle extra images: remove selected and add new, enforcing max total = 6
+        $existingExtras = is_array($product->extra_images) ? $product->extra_images : [];
+        $removeExtras = (array)$request->input('remove_extra_images', []);
+
+        if (!empty($removeExtras)) {
+            foreach ($removeExtras as $path) {
+                // Delete file if it exists
+                if ($path && \Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($path);
+                }
+            }
+        }
+        // Remaining after removal
+        $remainingExtras = array_values(array_diff($existingExtras, $removeExtras));
+
+        // Count new uploads
+        $newFiles = (array)$request->file('extra_images');
+        $newCount = 0;
+        foreach ($newFiles as $f) { if ($f) { $newCount++; } }
+
+        // Enforce limit against total
+        $targetTotal = count($remainingExtras) + $newCount;
+        if ($targetTotal > 6) {
+            return back()->with('error', 'Total extra images cannot exceed 6. Remove more before adding.')->withInput();
+        }
+
+        // Store new files and append
+        if (!empty($newFiles)) {
+            foreach ($newFiles as $extraFile) {
+                if ($extraFile && $extraFile->isValid()) {
+                    $remainingExtras[] = $extraFile->store('products', 'public');
+                }
+            }
+        }
+        // Save updated extras
+        $product->extra_images = $remainingExtras;
+        $product->save();
+
         // Handle the image update
          if ($request->hasFile('image')) {
              // Delete the old image if it exists under public/images
@@ -268,6 +314,7 @@ use App\Models\Order;
             'price' => 'required|numeric',
             'description' => 'nullable|string',
             'image' => 'image|nullable',
+            'extra_images' => 'array|nullable|max:6',
             'extra_images.*' => 'image|nullable',
             'measurement_image' => 'image|nullable',
             'sizes' => 'array|nullable',
