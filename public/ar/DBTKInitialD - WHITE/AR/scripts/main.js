@@ -196,8 +196,8 @@ async function init() {
       // Check if torso is fully inside the fixed box
       const insideFixed = pts.every((p) => p.x >= bx && p.x <= bx + bw && p.y >= by && p.y <= by + bh);
 
-      // Toggle model visibility based on alignment (model hidden when outside the box)
-      if (vto && vto.boneModel) vto.boneModel.visible = !!insideFixed;
+      // Keep model visible during tracking regardless of alignment box
+      if (vto && vto.boneModel) vto.boneModel.visible = true;
 
       // Overlay remains visible; manage dialogs
       if (mpCanvas && mpCanvas.style) mpCanvas.style.visibility = 'visible';

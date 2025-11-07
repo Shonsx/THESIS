@@ -43,18 +43,18 @@ export class VirtualTryOn {
     this.targetBodyScale = 1.0;
     this.bodySmoothing = 0.25; // Faster following for closer fit
     // Smoothing for body position following (0..1, higher = faster)
-    this.positionFollowAlpha = 0.35;
+    this.positionFollowAlpha = 0.75; // faster following for more responsive tracking
 
     // Enhanced auto-tracking properties
     // Depth in world units to map normalized landmarks to. Used for follow mapping.
     this.followDepth = 0.5; // bring mapped points closer to camera
     this.autoScaleEnabled = true;
     // Disable spine/chest orientation following unless explicitly enabled
-    this.spineChestFollowEnabled = false;
+    this.spineChestFollowEnabled = true;
     // Base vertical offset: slight downward baseline during tracking
-    this.baseVerticalOffset = -0.3; // small baseline lowering
+    this.baseVerticalOffset = 0.0; // reduce baseline lowering for natural center
     // Base horizontal offset: positive moves model to the right
-    this.baseHorizontalOffset = 1;
+    this.baseHorizontalOffset = 0; // center on torso midline
     this.distanceFromCamera = 0;
     this.targetDistance = 0;
     this.distanceSmoothing = 0.2;
