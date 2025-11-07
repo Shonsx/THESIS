@@ -332,7 +332,11 @@
                     <div id="extra-images-list" class="grid grid-cols-3 gap-2 mb-2">
                         <!-- thumbnails with remove checkboxes will be injected -->
                     </div>
-                    <input type="file" name="extra_images[]" accept="image/*" multiple class="w-full border p-2 rounded">
+                    <div id="new-extra-images-container" class="space-y-2"></div>
+                    <div class="flex items-center justify-between mt-2">
+                        <button type="button" id="btnAddExtraImage" class="bg-gray-200 px-3 py-1 rounded">Add another image</button>
+                        <span class="text-xs text-gray-600" id="new-extra-images-count">Selected new images: 0</span>
+                    </div>
                 </div>
 
                 <div class="flex justify-end space-x-2 sticky bottom-0 bg-white pt-2">
@@ -409,6 +413,59 @@
                     extraList.appendChild(wrap);
                 });
             }
+
+            // Setup incremental new extra images inputs
+            const newContainer = document.getElementById('new-extra-images-container');
+            const addBtn = document.getElementById('btnAddExtraImage');
+            const countEl = document.getElementById('new-extra-images-count');
+            newContainer.innerHTML = '';
+            let newCount = 0;
+            const existingCount = Array.isArray(extraImages) ? extraImages.length : 0;
+            const maxTotal = 6;
+            let maxNew = Math.max(0, maxTotal - existingCount);
+
+            function updateUI() {
+                countEl.textContent = `Selected new images: ${newCount}`;
+                addBtn.disabled = newCount >= maxNew;
+                addBtn.classList.toggle('opacity-50', addBtn.disabled);
+                addBtn.classList.toggle('cursor-not-allowed', addBtn.disabled);
+            }
+
+            function addInput() {
+                if (newCount >= maxNew) return;
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.name = 'extra_images[]';
+                input.accept = 'image/*';
+                input.className = 'w-full border p-2 rounded';
+                input.addEventListener('change', () => {
+                    // Count only if a file is chosen
+                    const hasFile = input.files && input.files.length > 0;
+                    // Ensure we only increment once per input
+                    if (hasFile && !input.dataset.counted) {
+                        input.dataset.counted = '1';
+                        newCount++;
+                        updateUI();
+                    } else if (!hasFile && input.dataset.counted) {
+                        input.dataset.counted = '';
+                        newCount = Math.max(0, newCount - 1);
+                        updateUI();
+                    }
+                });
+                newContainer.appendChild(input);
+            }
+
+            // Initial state
+            updateUI();
+            addBtn.onclick = addInput;
+
+            // Adjust maxNew dynamically when remove checkboxes toggle
+            extraList.addEventListener('change', () => {
+                const removed = Array.from(extraList.querySelectorAll('input[type="checkbox"]:checked')).length;
+                const remaining = Math.max(0, existingCount - removed);
+                maxNew = Math.max(0, maxTotal - remaining);
+                updateUI();
+            });
 
             // Reset sizes: all unchecked, stock = 0, hidden
             Object.keys(@json($sizeNames)).forEach(size => {

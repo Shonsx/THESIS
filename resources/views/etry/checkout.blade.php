@@ -22,7 +22,7 @@
         }
     </style>
 
-    <div class="container mx-auto p-4">
+    <div class="container mx-auto p-4 pb-24 sm:pb-4">
         <h1 class="text-2xl font-bold mb-4 text-center">🛒 Checkout</h1>
 
         <form action="{{ route('checkout.process') }}" method="POST" enctype="multipart/form-data">
@@ -134,7 +134,7 @@
                     <div class="bg-white rounded-lg shadow-lg p-4">
                         <h2 class="text-lg font-bold mb-2 text-center">Pay with GCash</h2>
 
-                        <img src="{{ asset('images/gcashQR.jfif') }}" alt="GCash QR" class="w-full max-h-[300px] object-contain mb-2" />
+                        <img src="{{ asset('images/gcashQR.jfif') }}" alt="GCash QR" class="w-full max-h-[420px] sm:max-h-[480px] md:max-h-[560px] object-contain mb-2" />
 
                         <label for="payment_proof" class="font-semibold block text-center mt-2">Upload Proof of Payment:</label>
                         <input type="file" name="payment_proof" id="payment_proof" accept="image/*" required class="mt-2 border px-2 py-1 rounded w-full">
