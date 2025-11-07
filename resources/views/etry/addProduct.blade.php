@@ -67,8 +67,13 @@
                 <textarea name="description" id="description" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500" required></textarea>
             </div>
             <div class="mb-4">
-                <label for="image" class="block text-sm font-medium text-gray-700">Image</label>
+                <label for="image" class="block text-sm font-medium text-gray-700">Display Product Image</label>
                 <input type="file" name="image" id="image" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 cursor-pointer hover:border-blue-500" accept="image/*">
+            </div>
+
+            <div class="mb-4">
+                <label for="extra_images" class="block text-sm font-medium text-gray-700">More Product images</label>
+                <input type="file" name="extra_images[]" id="extra_images" multiple class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 cursor-pointer hover:border-blue-500" accept="image/*">
             </div>
             <button type="submit" class="w-full px-3 py-2 bg-[#B22222] text-white rounded-md hover:bg-[#00c7c7] transition duration-500">Add Product</button>
         </form>

@@ -130,15 +130,11 @@
                         </div>
                     </div>
 
-                    {{-- GCash --}}
+                    {{-- GCash (static image from public/images/gcashQR.jfif) --}}
                     <div class="bg-white rounded-lg shadow-lg p-4">
                         <h2 class="text-lg font-bold mb-2 text-center">Pay with GCash</h2>
 
-                        @if(isset($gcash) && $gcash->image_path)
-                            <img src="{{ route('files.public', ['path' => $gcash->image_path]) }}" alt="GCash QR" class="w-full max-h-[300px] object-contain mb-2" />
-                        @else
-                            <p class="text-center text-sm">GCash image not available</p>
-                        @endif
+                        <img src="{{ asset('images/gcashQR.jfif') }}" alt="GCash QR" class="w-full max-h-[300px] object-contain mb-2" />
 
                         <label for="payment_proof" class="font-semibold block text-center mt-2">Upload Proof of Payment:</label>
                         <input type="file" name="payment_proof" id="payment_proof" accept="image/*" required class="mt-2 border px-2 py-1 rounded w-full">

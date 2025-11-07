@@ -16,12 +16,14 @@ class Product extends Model
         'price',
         'description',
         'image',
+        'extra_images',
         'sizes',
         'measurement_image',
     ];
 
     protected $casts = [
         'sizes' => 'array',
+        'extra_images' => 'array',
     ];
 
     public function stocks()

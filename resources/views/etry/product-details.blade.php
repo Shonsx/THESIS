@@ -32,12 +32,33 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
                 <!-- Left: Product Card -->
                 <div class="bg-white rounded-lg shadow-2xl p-6 md:p-8 grid grid-cols-1 gap-6 items-stretch h-full">
-                    <!-- Product Image -->
+                    <!-- Product Image / Slideshow -->
+                    @php
+                        $allImages = [];
+                        if (!empty($product->image)) {
+                            $allImages[] = $product->image;
+                        }
+                        if (!empty($product->extra_images) && is_array($product->extra_images)) {
+                            $allImages = array_merge($allImages, $product->extra_images);
+                        }
+                    @endphp
                     <div class="relative w-full flex items-center justify-center overflow-hidden h-[380px] sm:h-[420px] md:h-[480px] rounded-lg">
-                        <img src="{{ route('files.public', ['path' => $product->image]) }}"
+                        <img id="mainProductImage" src="{{ route('files.public', ['path' => $allImages[0] ?? $product->image]) }}"
                             alt="{{ $product->name }}"
-                            class="w-full h-full object-contain rounded-lg transition-transform duration-300 ease-out hover:scale-110 cursor-zoom-in" />
+                            class="w-full h-full object-contain rounded-lg transition-transform duration-300 ease-out hover:scale-110 cursor-pointer" />
+                        @if(count($allImages) > 1)
+                            <button id="prevImageBtn" type="button" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white px-2 py-1 rounded">Prev</button>
+                            <button id="nextImageBtn" type="button" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white px-2 py-1 rounded">Next</button>
+                        @endif
                     </div>
+                    @if(count($allImages) > 1)
+                        <div class="flex gap-2 mt-2 justify-center">
+                            @foreach($allImages as $idx => $img)
+                                <img data-idx="{{ $idx }}" src="{{ route('files.public', ['path' => $img]) }}" alt="thumb"
+                                     class="w-16 h-16 object-contain border rounded cursor-pointer hover:border-blue-500" />
+                            @endforeach
+                        </div>
+                    @endif
                     
                     <!-- Product Details -->
                     <div class="flex flex-col gap-4">
@@ -172,6 +193,28 @@
 
     <!-- JavaScript -->
     <script>
+        // Simple slideshow for product images
+        (function(){
+            const images = @json($allImages);
+            let current = 0;
+            const mainImg = document.getElementById('mainProductImage');
+            const prevBtn = document.getElementById('prevImageBtn');
+            const nextBtn = document.getElementById('nextImageBtn');
+
+            function show(idx){
+                if (!images.length) return;
+                current = (idx + images.length) % images.length;
+                mainImg.src = `${window.location.origin}/files/${encodeURIComponent(images[current])}`;
+            }
+            if (mainImg) {
+                mainImg.addEventListener('click', () => show(current + 1));
+            }
+            if (prevBtn) prevBtn.addEventListener('click', () => show(current - 1));
+            if (nextBtn) nextBtn.addEventListener('click', () => show(current + 1));
+            document.querySelectorAll('[data-idx]').forEach(el => {
+                el.addEventListener('click', () => show(parseInt(el.dataset.idx, 10)));
+            });
+        })();
         function toggleCartIcon(button, productId) {
             const img = button.querySelector('.cart-icon');
 

@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Cart;
 use App\Models\Product;
 use App\Models\Order;
-use App\Models\GCash;
 class CartController extends Controller
 {
     public function addToCart($id){
@@ -86,7 +85,7 @@ class CartController extends Controller
     public function checkout(Request $request){
         $selectedItems = explode(',', $request->query('items', ''));
         $productId = $request->query('productId'); // NEW: for direct product purchase
-        $gcash = GCash::latest()->first();
+        // GCash dynamic image removed; checkout will use static public image
 
         // For single product checkout
         if ($productId) {
@@ -94,7 +93,6 @@ class CartController extends Controller
 
             return view('etry.checkout', [
                 'product' => $product,
-                'gcash' => $gcash,
             ]);
         }
 
@@ -107,7 +105,7 @@ class CartController extends Controller
             return redirect()->route('cart.show')->with('error', 'No items selected for checkout.');
         }
 
-        return view('etry.checkout', compact('cartItems', 'gcash'));
+        return view('etry.checkout', compact('cartItems'));
     }
 
 }

@@ -268,6 +268,7 @@ use App\Models\Order;
             'price' => 'required|numeric',
             'description' => 'nullable|string',
             'image' => 'image|nullable',
+            'extra_images.*' => 'image|nullable',
             'measurement_image' => 'image|nullable',
             'sizes' => 'array|nullable',
             'gender' => 'required|in:Men,Women',
@@ -300,6 +301,16 @@ use App\Models\Order;
             $measurementImagePath = $storagePath;
         }
 
+        // Handle extra images (multiple)
+        $extraImagePaths = [];
+        if ($request->hasFile('extra_images')) {
+            foreach ((array)$request->file('extra_images') as $extraFile) {
+                if ($extraFile && $extraFile->isValid()) {
+                    $extraImagePaths[] = $extraFile->store('products', 'public');
+                }
+            }
+        }
+
         // Save product
         $sizes = $request->input('sizes', []);
         if (!is_array($sizes)) { $sizes = []; }
@@ -309,6 +320,7 @@ use App\Models\Order;
             'price' => $request->price,
             'description' => $request->description,
             'image' => $imagePath ?? '',
+            'extra_images' => $extraImagePaths,
             'measurement_image' => $measurementImagePath, // ← Save measurement image
             'sizes' => json_encode($sizes),
             'gender' => $request->gender,

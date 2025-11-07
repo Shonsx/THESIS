@@ -77,12 +77,7 @@ Route::put('/products/{id}', [ProductController::class, 'update'])->name('produc
 Route::post('/products/{product}/adjust-stock', [ProductController::class, 'adjustStock'])
     ->middleware('auth')
     ->name('products.adjustStock');
-Route::get('/etry/gcash', function () {
-    return view('etry.gcash');
-})->name('gcash.page');
-Route::get('/gcash', [GCashController::class, 'index'])->name('gcash.index');
-Route::post('/gcash', [GCashController::class, 'store'])->name('gcash.store');
-Route::delete('/gcash', [GCashController::class, 'destroy'])->name('gcash.destroy');
+// GCash feature removed: using static public image instead
 
 // Serve files from storage/app/public without relying on web server symlink
 // More tolerant: accepts paths like "products/foo.webp", "storage/products/foo.webp", or just "foo.webp"
