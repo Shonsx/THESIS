@@ -119,15 +119,43 @@
                                 </button>
                               <!-- Try-On Camera Icon (shown when product folder exists under public/ar/{product->name}) -->
                               @php
-                                  $productFolderPath = public_path('ar/' . $product->name);
-                                  $sizeCheckerIndex = $productFolderPath . '/SizeChecker/index.html';
-                                  $arIndex = $productFolderPath . '/AR/index.html';
-                                  $hasArFolder = is_dir($productFolderPath) && (file_exists($sizeCheckerIndex) || file_exists($arIndex));
-                                  $encodedName = rawurlencode($product->name);
-                                  $sizeCheckerUrl = "/ar/{$encodedName}/"; // DirectoryIndex will show SizeChecker/index.html
+                                  // Flexible AR folder matching:
+                                  // - Case-insensitive
+                                  // - Ignores spaces, underscores, hyphens, and symbols
+                                  $arRoot = public_path('ar');
+                                  $normalize = function ($s) {
+                                      $lower = strtolower($s);
+                                      return preg_replace('/[^a-z0-9]+/', '', $lower);
+                                  };
+                                  $productNorm = $normalize($product->name);
+                                  $matchedFolder = null;
+
+                                  if (is_dir($arRoot)) {
+                                      foreach (scandir($arRoot) as $entry) {
+                                          if ($entry === '.' || $entry === '..') continue;
+                                          $entryPath = $arRoot . DIRECTORY_SEPARATOR . $entry;
+                                          if (is_dir($entryPath)) {
+                                              if ($normalize($entry) === $productNorm) {
+                                                  $matchedFolder = $entry;
+                                                  break;
+                                              }
+                                          }
+                                      }
+                                  }
+
+                                  $hasArFolder = false;
+                                  $sizeCheckerUrl = null;
+                                  if ($matchedFolder) {
+                                      $sizeCheckerIndex = $arRoot . "/{$matchedFolder}/SizeChecker/index.html";
+                                      $arIndex = $arRoot . "/{$matchedFolder}/AR/index.html";
+                                      $hasArFolder = (file_exists($sizeCheckerIndex) || file_exists($arIndex));
+                                      $encodedName = rawurlencode($matchedFolder);
+                                      // Default route to product root; index.html there should redirect to SizeChecker
+                                      $sizeCheckerUrl = "/ar/{$encodedName}/";
+                                  }
                               @endphp
 
-                              @if($hasArFolder)
+                              @if($hasArFolder && $sizeCheckerUrl)
                                   <a href="{{ $sizeCheckerUrl }}" target="_blank" title="Try On">
                                       <img src="{{ asset('icons/camera.svg') }}" alt="TRY-ON" class="w-6 h-6 sm:w-7 sm:h-7 cursor-pointer">
                                   </a>
