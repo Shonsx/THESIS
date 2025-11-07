@@ -117,31 +117,21 @@
                                     <img src="{{ in_array($product->id, $cartItemIds) ? asset('icons/addtocart-on.svg') : asset('icons/addtocart-off.svg') }}" 
                                         alt="add-to-cart" class="w-6 h-6 sm:w-7 sm:h-7 cursor-pointer cart-icon transition-transform duration-200 ease-in-out object-contain">
                                 </button>
-                              <!-- Try-On Button -->
-                               @php
-                                    $productId = $product->id;
-                                    $productFolderPath = public_path("ar/product{$productId}");
+                              <!-- Try-On Camera Icon (shown when product folder exists under public/ar/{product->name}) -->
+                              @php
+                                  $productFolderPath = public_path('ar/' . $product->name);
+                                  $sizeCheckerIndex = $productFolderPath . '/SizeChecker/index.html';
+                                  $arIndex = $productFolderPath . '/AR/index.html';
+                                  $hasArFolder = is_dir($productFolderPath) && (file_exists($sizeCheckerIndex) || file_exists($arIndex));
+                                  $encodedName = rawurlencode($product->name);
+                                  $sizeCheckerUrl = "/ar/{$encodedName}/"; // DirectoryIndex will show SizeChecker/index.html
+                              @endphp
 
-                                    $testFilePath = '';
-
-                                    if (is_dir($productFolderPath)) {
-                                        $subfolders = array_filter(glob($productFolderPath . '/*'), 'is_dir');
-
-                                        foreach ($subfolders as $subfolder) {
-                                            $possibleTestFile = $subfolder . '/test.html'; // Look directly here
-                                            if (file_exists($possibleTestFile)) {
-                                                $testFilePath = $possibleTestFile;
-                                                break;
-                                            }
-                                        }
-                                    }
-                                @endphp
-
-                                @if($testFilePath)
-                                    <a href="{{ route('tryon.test', ['id' => $productId]) }}" target="_blank" title="Try On">
-                                        <img src="{{ asset('icons/camera.svg') }}" alt="TRY-ON" class="w-6 h-6 sm:w-7 sm:h-7 cursor-pointer">
-                                    </a>
-                                @endif
+                              @if($hasArFolder)
+                                  <a href="{{ $sizeCheckerUrl }}" target="_blank" title="Try On">
+                                      <img src="{{ asset('icons/camera.svg') }}" alt="TRY-ON" class="w-6 h-6 sm:w-7 sm:h-7 cursor-pointer">
+                                  </a>
+                              @endif
 
 
 

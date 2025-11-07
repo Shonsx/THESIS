@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AR Try-On • Anatomical Rig</title>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.165.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.165.0/examples/jsm/"
+      }
+    }
+  </script>
+  <style>
+    html, body { height: 100%; }
+    body { margin: 0; background: radial-gradient(1200px 600px at 20% -10%, #2a184a 0%, #120a1f 60%); color: #e8eaed; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+    .layout { display: grid; grid-template-columns: 1fr; gap: 0; height: 100vh; box-sizing: border-box; padding: 16px; }
+    #viewer { position: relative; border: 0; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 0 2px #3a245e inset; }
+    #viewer video { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; filter: saturate(1.05) contrast(1.02); z-index:0; }
+    #mpCanvas { position:absolute; inset:0; width:100%; height:100%; display:block; pointer-events:none; z-index:300; }
+    #canvas { position:absolute; inset:0; width:100%; height:100%; display:block; pointer-events:none; z-index:100; }
+    #viewerLabel { position:absolute; top:14px; left:14px; font-size:24px; color:#ffd54f; opacity:0.9; pointer-events:none; text-shadow: 0 2px 12px rgba(0,0,0,0.5); }
+    /* Minimal HUD */
+    #hud { position:absolute; bottom:16px; left:16px; display:flex; gap:10px; align-items:center; background: rgba(34,18,56,0.6); backdrop-filter: blur(6px); border: 1px solid rgba(126,63,242,0.4); border-radius: 10px; padding: 8px 12px; z-index:3; pointer-events:auto; }
+    #status { font-size:14px; color:#a7b3c3; }
+    .btn { background:#7e3ff2; color:#fff; border:none; border-radius:8px; padding:8px 12px; cursor:pointer; font-weight:600; box-shadow: 0 6px 18px rgba(126,63,242,0.25); }
+    .btn:disabled { opacity:0.6; cursor:not-allowed; }
+    /* Right-side control panel */
+    #controlPanel { position:absolute; right:16px; top:16px; z-index:4; pointer-events:auto; background: rgba(34,18,56,0.7); backdrop-filter: blur(6px); border:1px solid rgba(126,63,242,0.4); border-radius:12px; padding:12px; width:220px; color:#e8eaed; }
+    #controlPanel h3 { margin:0; font-size:14px; font-weight:700; color:#e8eaed; }
+    #controlPanelHeader { display:flex; align-items:center; justify-content:space-between; gap:8px; margin:0 0 10px 0; }
+    #logoImg { height:24px; width:auto; object-fit:contain; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.35)); }
+    .ctrl { display:flex; flex-direction:column; gap:6px; margin-bottom:10px; }
+    .ctrl label { font-size:12px; color:#d2bfff; display:flex; justify-content:space-between; }
+    .ctrl label span:last-child { color:#ffd54f; }
+    .ctrl input[type="range"] { width:100%; }
+    /* Model box overlay */
+    #modelBox { position:absolute; border:2px dashed rgba(0,255,255,0.85); border-radius:8px; z-index:200; pointer-events:none; display:none; box-shadow: 0 0 0 1px rgba(0,255,255,0.25) inset; }
+    /* Outside-box dialog */
+    #outsideDialog { position:absolute; top:16px; left:50%; transform: translate(-50%, -50%); z-index:400; pointer-events:none; 
+      background: rgba(220, 30, 30, 0.85); color:#fff; border:1px solid rgba(255,255,255,0.25); border-radius:12px; padding:10px 14px; 
+      font-weight:700; letter-spacing:0.2px; box-shadow: 0 10px 30px rgba(220,30,30,0.35), 0 0 0 2px rgba(255,255,255,0.06) inset; display:none; }
+    /* Inside-box top dialog */
+    #insideDialog { position:absolute; top:12px; left:50%; transform: translateX(-50%); z-index:400; pointer-events:none; 
+      background: rgba(31,111,235,0.85); color:#fff; border:1px solid rgba(255,255,255,0.25); border-radius:12px; padding:8px 12px; 
+      font-weight:700; letter-spacing:0.2px; box-shadow: 0 10px 30px rgba(31,111,235,0.35), 0 0 0 2px rgba(255,255,255,0.06) inset; display:none; }
+  </style>
+</head>
+<body>
+  <div class="layout">
+  <main id="viewer">
+    <div id="viewerLabel">Try-on</div>
+    <video id="inputVideo" playsinline muted autoplay></video>
+    <canvas id="mpCanvas"></canvas>
+    <canvas id="canvas"></canvas>
+    <div id="modelBox"></div>
+    <div id="outsideDialog">Get back inside the box</div>
+    <div id="insideDialog">Stay centered in the box</div>
+      <div id="controlPanel">
+        <div id="controlPanelHeader">
+          <h3>Controls</h3>
+          <img id="logoImg" src="./Materials/Logo.png" alt="Logo" />
+        </div>
+        <div class="ctrl">
+          <label>
+            <span>Scale</span>
+            <span id="scaleValue">1.00×</span>
+          </label>
+          <input id="scaleSlider" type="range" min="0.4" max="3.0" step="0.01" value="1.00" />
+        </div>
+        <div class="ctrl">
+          <label>
+            <span>Vertical Offset</span>
+            <span id="verticalValue">0.00</span>
+          </label>
+          <input id="verticalSlider" type="range" min="-1.5" max="1.0" step="0.01" value="0.00" />
+        </div>
+        
+        
+      </div>
+    <div id="hud">
+      <button id="startBtn" class="btn">Start Camera</button>
+      <div id="status">Idle</div>
+    </div>
+  </main>
+  </div>
+
+  <script type="module" src="./scripts/main.js?v=2"></script>
+</body>
+</html>

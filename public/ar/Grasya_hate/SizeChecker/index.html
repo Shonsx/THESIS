@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Live Camera Size Checker - MediaPipe</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="popup-styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      background-color: #000;
+      color: #fff;
+    }
+    /* Decorative side background using Material.png as repeating columns */
+    .bg-side {
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      width: 220px;
+      background: url('Material.png') repeat-y center/cover;
+      z-index: 1;
+    }
+    .bg-left { left: 0; }
+    .bg-right { right: 0; }
+
+    /* Center logo at top */
+    .top-logo {
+      position: relative;
+      z-index: 2;
+      margin-top: 14px;
+      margin-bottom: 12px;
+      height: 120px;
+    }
+    .top-logo img {
+      height: 120px;
+      width: auto;
+      display: block;
+    }
+    .top-logo.loading img { animation: pulse 1.4s ease-in-out infinite; }
+    .top-logo.spinning img { animation: spin 3.5s linear infinite; }
+
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.05); opacity: 0.85; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    #video, #canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      transform: scaleX(-1);
+      object-fit: cover; /* fill while keeping aspect */
+      pointer-events: none; /* allow UI interactions on top */
+    }
+    .container {
+      position: relative;
+      width: min(92vw, 92vh, 1280px);
+      aspect-ratio: 1 / 1; /* responsive square */
+      margin: 20px auto;
+      border: 6px solid #fff;
+      overflow: hidden; /* Ensure content stays within bounds */
+      z-index: 2; /* above background */
+    }
+    #calibrationInstructions, #sizeResult {
+      text-align: center;
+      font-size: clamp(1rem, 2.8vw, 1.6rem);
+      padding: 12px 14px;
+      border-radius: 10px;
+      margin: 16px auto 0;
+      background-color: rgba(0, 0, 0, 0.6);
+      color: white;
+      max-width: min(92vw, 720px);
+      border: 2px solid #FFC107;
+    }
+    /* Center the calibration instructions overlay */
+    #calibrationInstructions {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 12; /* above side controls */
+    }
+    #sizeResult {
+      font-weight: bold;
+      margin-bottom: 20px;
+      background-color: #FFC107;
+      color: #000;
+    }
+    .controls {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 20px; /* Adjust margin as needed */
+    }
+    #startButton {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+      background-color: #FFC107;
+      color: #000;
+      font-size: 2.5em;
+      font-weight: bold;
+      padding: 30px 80px;
+      border: none;
+      border-radius: 16px;
+      cursor: pointer;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+      transition: background 0.2s;
+    }
+    #startButton:hover {
+      background-color: #e0a800;
+    }
+
+    .side-controls {
+      position: absolute;
+      right: 24px;
+      top: 24px;
+      transform: none;
+      display: none; /* shown after Start */
+      flex-direction: column;
+      gap: 16px;
+      z-index: 11;
+    }
+    /* Use circular image icons directly (no box); larger size and darker hover */
+    .side-controls img {
+      width: clamp(48px, 8vw, 72px);
+      height: clamp(48px, 8vw, 72px);
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.35);
+      transition: filter 0.15s ease, transform 0.1s ease;
+      border: none;
+    }
+    .side-controls img:hover {
+      filter: brightness(0.85);
+      transform: translateY(-1px);
+    }
+    /* Result popup */
+    .result-modal {
+      position: fixed;
+      inset: 0;
+      display: none; /* shown programmatically */
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+      background: rgba(0,0,0,0.5);
+    }
+    .result-card {
+      background: #fff;
+      color: #000;
+      width: min(92vw, 720px);
+      border-radius: 18px;
+      border: 5px solid #000;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+      overflow: hidden;
+    }
+    .result-header {
+      background: #FFC107;
+      color: #000;
+      padding: 16px 22px;
+      font-weight: bold;
+      font-size: clamp(1.1rem, 3.2vw, 1.4rem);
+    }
+    .result-body {
+      padding: 20px 22px;
+      font-size: clamp(1rem, 3vw, 1.3rem);
+    }
+    .result-actions {
+      display: flex;
+      gap: 12px;
+      padding: 14px 18px 20px;
+    }
+    .result-actions button {
+      flex: 1;
+      padding: 12px 16px;
+      background: #000;
+      color: #fff;
+      border: 2px solid #000;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: filter 0.15s ease;
+    }
+    .result-actions button:hover { filter: brightness(1.1); }
+    .result-actions .tryon { background: #fff; color: #000; border-color: #000; }
+  </style>
+</head>
+<body>
+  <div class="bg-side bg-left"></div>
+  <div class="bg-side bg-right"></div>
+  <div class="top-logo" id="topLogo"><img src="Logo.png" alt="Logo" /></div>
+  <div class="container">
+    <video id="video" playsinline></video>
+    <canvas id="canvas"></canvas>
+    <button id="startButton" style="display:none;">Start</button>
+    <div class="side-controls" id="sideControls">
+      <img id="repeatButton" src="Repeat.png" alt="Repeat" aria-label="Repeat" />
+      <img id="exitButton" src="Exit.png" alt="Exit" aria-label="Exit" />
+    </div>
+  </div>
+  <div id="calibrationInstructions"></div>
+  <div class="controls">
+    <div id="sizeResult">Press Start to begin</div>
+  </div>
+  <div class="result-modal" id="resultModal">
+    <div class="result-card">
+      <div class="result-header" id="resultHeader">Your Size Result</div>
+      <div class="result-body" id="resultBody">Calculating...</div>
+      <div class="result-actions">
+        <button class="repeat" id="popupRepeat">Repeat</button>
+        <button class="tryon" id="popupTryOn">To try on</button>
+        <button class="close" id="popupClose">Close</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Instruction / Disclaimer Wizard Popup (Integrated from popupSize) -->
+  <div class="modal" id="instructionModal" aria-hidden="true" role="dialog" aria-labelledby="instructionTitle">
+    <div class="overlay" onclick="closeInstruction()"></div>
+    <div class="modal-card instruction-card slide-in">
+      <div class="wizard">
+        <!-- Step 1: SIZE CHART + Chest Width (inches) -->
+        <section class="step" data-step="1">
+          <h2 class="chart-heading">SIZE CHART</h2>
+          <img src="Chart.jpg" alt="Size Chart - Men’s T-Shirts" class="chart-image" />
+
+          <div class="input-group">
+            <label for="chestWidth">What is your chest width? (inches)</label>
+            <input type="number" id="chestWidth" inputmode="decimal" min="16" max="24" step="0.1" placeholder="e.g., 20" />
+            <small class="hint">Measure across the garment, ~2 inches below the armholes (edge to edge).</small>
+          </div>
+
+          <div class="row">
+            <button class="btn accent" id="continueChest">Next</button>
+            <button class="btn ghost" id="skipMeasurements" type="button">i dont know my measurement</button>
+            <button class="btn gradient" id="tryOnBtnStep1" type="button">Try-On</button>
+          </div>
+        </section>
+
+        <!-- Step 2: Height (inches) -->
+        <section class="step" data-step="2" hidden>
+          <h2>Your Height</h2>
+          <p>Please enter your height in inches.</p>
+
+          <div class="input-group">
+            <label for="heightIn">Height (inches)</label>
+            <input type="number" id="heightIn" inputmode="decimal" min="24" max="32" step="0.1" placeholder="e.g., 27" />
+          </div>
+
+          <div class="row">
+            <button class="btn accent" id="continueHeight">Next</button>
+          </div>
+        </section>
+
+        <!-- Step 3: Outcome with conditional Instructions & Disclaimer (no chart here) -->
+        <section class="step" data-step="3" hidden>
+          <div id="disclaimerBlock">
+            <h2>Instructions & Disclaimer</h2>
+            <ul id="disclaimerContainer" class="disclaimer">
+              <li>Position yourself 4–5 steps away from the camera.</li>
+              <li>Remain still unless prompted to adjust your position.</li>
+              <li>Our size recommendation is a suggestion only.</li>
+              <li>Avoid wearing bulky jackets that may interfere with the Mediapipe scanner's accuracy.</li>
+              <li>If no result is provided, please provide your chest width and height for a size suggestion.</li>
+            </ul>
+            <p class="disclaimer-note">
+              <strong>Disclaimer:</strong> Please note that our size recommendation is a suggestion and may not be your exact size. Follow our recommendations at your own discretion. All units are in inches.
+            </p>
+
+          </div>
+          <div id="resultText" class="result-text"></div>
+          <div id="chartContainer" class="chart-container"></div>
+
+          <div class="row">
+            <button class="btn gradient" id="tryOnBtn" type="button">Try-On</button>
+            <button class="btn ghost" id="homeBtn" type="button">Home</button>
+            <button class="btn accent" id="tryAnotherBtn" type="button">Try Another</button>
+          </div>
+
+          <div class="inline-disclaimer">Disclaimer: Please note that our size recommendation is a suggestion and may not be your exact size. Follow our recommendations at your own discretion.</div>
+          <div class="row soft">
+            <button class="btn dark-orange" id="finalNext" type="button">Try checking shirt size using Pose tracker?</button>
+          </div>
+        </section>
+      </div>
+
+      <button class="close-x" aria-label="Close" onclick="closeInstruction()">×</button>
+    </div>
+  </div>
+  
+  <script src="script.js"></script>
+  <script src="popup.js"></script>
+  <script>
+    document.getElementById('startButton').addEventListener('click', function() {
+      this.style.display = 'none';
+      if (typeof startSizeTry === 'function') startSizeTry();
+    });
+  </script>
+</body>
+</html>
