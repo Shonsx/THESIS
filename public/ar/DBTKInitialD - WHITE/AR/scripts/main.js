@@ -36,7 +36,8 @@ async function init() {
   vto = new VirtualTryOn();
   vto.init(canvas);
   try {
-    await vto.loadModel(vto.modelPath);
+    // Let the loader try multiple candidates automatically
+    await vto.loadModel();
     if (statusEl) statusEl.textContent = 'Model loaded';
   } catch (e) {
     console.error('Model failed to load', e);

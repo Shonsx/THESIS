@@ -33,8 +33,43 @@ export class VirtualTryOn {
     this.modelPositionZ = 0.0; // in front of camera (camera looks down -Z)
     this.smoothingFactor = 0.6;
     this.isLoading = true;
-    // Sean eto yung path paltan paltan mo
+    // Default model path (will be overridden by candidates below)
     this.modelPath = 'DBTK.glb';
+
+    // Build candidate GLB filenames to handle varying product names
+    try {
+      const parts = (window.location && window.location.pathname || '').split('/').filter(Boolean);
+      const productNameRaw = parts.length >= 2 ? decodeURIComponent(parts[1]) : '';
+      const baseNoColor = productNameRaw.split('-')[0].trim();
+      const compact = productNameRaw.replace(/[\s_-]+/g, '');
+      const withUnderscores = productNameRaw.replace(/[\s-]+/g, '_');
+      this.modelPathCandidates = [
+        './DBTK.glb',
+        './DBTKInitialD.glb',
+        './DBTKSpace.glb',
+        './GrasyaSleek.glb',
+        './DisGrasya.glb',
+        './JeepNagtitinda.glb',
+        './model.glb',
+        './shirt.glb',
+        './tshirt.glb',
+        `./${baseNoColor}.glb`,
+        `./${compact}.glb`,
+        `./${withUnderscores}.glb`,
+      ];
+    } catch (_) {
+      this.modelPathCandidates = [
+        './DBTK.glb',
+        './DBTKInitialD.glb',
+        './DBTKSpace.glb',
+        './GrasyaSleek.glb',
+        './DisGrasya.glb',
+        './JeepNagtitinda.glb',
+        './model.glb',
+        './shirt.glb',
+        './tshirt.glb',
+      ];
+    }
 
     // Body tracking properties
     this.bodyPosition = new THREE.Vector3(0, 0, 0);
